@@ -15,18 +15,44 @@ class MainScreen extends StatelessWidget {
                 height: 200,
                 color: Colors.grey,
               ),
-              SizedBox(
+              const SizedBox(
                 height: 10,
               ),
-              FiltersWidget(),
-              SizedBox(
+              const FiltersWidget(),
+              const SizedBox(
                 height: 10,
               ),
-              MarkerplaceSelectorWidget(),
+              const MarkerplaceSelectorWidget(),
+              const SizedBox(
+                height: 10,
+              ),
+              ProductsListViewWidget(),
+              
             ],
           ),
         ),
       ),
+    );
+  }
+}
+
+class ProductsListViewWidget extends StatelessWidget {
+  const ProductsListViewWidget({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      shrinkWrap: true,
+      itemCount: 10,
+      itemBuilder: (context, index) {
+        return Container(
+          height: 100,
+          color: Colors.grey,
+          margin: const EdgeInsets.only(bottom: 10),
+        );
+      },
     );
   }
 }
@@ -38,28 +64,48 @@ class MarkerplaceSelectorWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       height: 70,
-      color: Colors.grey,
       child: Row(
         children: [
           Expanded(
-            child: TextButton(
-                onPressed: () {}, child: const Text('Фора')),
+            child: Container(
+              color: Colors.grey,
+              margin:  const EdgeInsets.only(right: 5),
+              child: TextButton(
+                  onPressed: () {}, child: const Text('Фора')),
+            ),
           ),
           Expanded(
-            child: TextButton(
-                onPressed: () {}, child: const Text('Траш')),
+            child: Container(
+              color: Colors.grey,
+              margin:  const EdgeInsets.symmetric(horizontal: 5),
+              child: TextButton(
+                  onPressed: () {}, child: const Text('Траш')),
+            ),
           ),
           Expanded(
-            child: TextButton(
-                onPressed: () {}, child: const Text('АТБ')),
+            child: Container(
+              color: Colors.grey,
+              margin:  const EdgeInsets.symmetric(horizontal: 5),
+              child: TextButton(
+                  onPressed: () {}, child: const Text('АТБ')),
+            ),
           ),
           Expanded(
-            child: TextButton(
-                onPressed: () {}, child: const Text('Сільпо')),
+            child: Container(
+              color: Colors.grey,
+              margin:  const EdgeInsets.symmetric(horizontal: 5),
+              child: TextButton(
+                  onPressed: () {}, child: const Text('Сільпо')),
+            ),
           ),
-          Expanded(child: TextButton(onPressed: () {}, child: const Text('Вcі'))),
+          Expanded(
+              child: Container(
+                  margin: const EdgeInsets.only(left: 5),
+                  color: Colors.grey,
+                  child:
+                      TextButton(onPressed: () {}, child: const Text('Вcі')))),
         ],
       ),
     );
@@ -92,6 +138,7 @@ class FiltersWidget extends StatelessWidget {
               Expanded(child: TextButton(onPressed: () {}, child: const Text('Губи'))),
             ],
           ),
+          const Divider(color: Colors.black,), 
           FilledButton(onPressed: () {}, child: const Text('Фільтр'))
         ],
       ),
