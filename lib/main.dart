@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:markerplace_seals/widgets/main_screen.dart';
+import 'package:markerplace_sales_monitor/widgets/main_screen.dart';
 
 void main() {
   runApp(const MainApp());

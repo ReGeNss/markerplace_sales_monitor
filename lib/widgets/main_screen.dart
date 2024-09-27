@@ -1,58 +1,120 @@
 import 'package:flutter/material.dart';
 
+const TextStyle defaultTextStyleOfMarkets =  TextStyle(color: Colors.black, fontSize: 12);
+const TextStyle defaultTextStyleOfSaleFilters =  TextStyle(color: Colors.black, fontSize: 15);
+const TextStyle productCardTextStyle =  TextStyle(color: Colors.white, fontSize: 15);
+const Color defaultColor = Color.fromRGBO(217, 217, 217, 1); 
+BoxDecoration defaultDecoration = BoxDecoration(
+  borderRadius: BorderRadius.circular(20),
+  color: defaultColor,
+);
+ButtonStyle buttonStyle = ButtonStyle(
+  overlayColor: WidgetStatePropertyAll<Color>(Color.fromRGBO(106, 96, 96, 0.5),),
+  fixedSize: WidgetStatePropertyAll<Size>(Size.fromHeight(55)),
+);
+
+
 class MainScreen extends StatelessWidget {
   const MainScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.only(top: 50,bottom: 20, left: 20, right: 20),
-          child: Column(
-            children: [
-              Container(
-                height: 200,
-                color: Colors.grey,
+      body: CustomScrollView(slivers: [
+        SliverToBoxAdapter(
+          child: Container(
+              decoration: defaultDecoration,
+              margin: const EdgeInsets.only(top: 25, left: 20, right: 20),
+              height: 200,
+              child: const Center(
+                child: Text('Найбільш губні знижки саме тут!',style: TextStyle(fontSize: 30),textAlign: TextAlign.center, ),
               ),
-              const SizedBox(
-                height: 10,
-              ),
-              const FiltersWidget(),
-              const SizedBox(
-                height: 10,
-              ),
-              const MarkerplaceSelectorWidget(),
-              const SizedBox(
-                height: 10,
-              ),
-              ProductsListViewWidget(),
-              
-            ],
-          ),
+             ),
         ),
-      ),
+        const SliverAppBar(
+          surfaceTintColor: Colors.transparent,
+          toolbarHeight: 0,
+          snap: true,
+          primary: false,
+          pinned: true,
+          floating: true,
+          bottom: PreferredSize(
+              preferredSize: Size.fromHeight(250),
+              child: Padding(
+                  padding: EdgeInsets.only(bottom: 0, left: 20, right: 20),
+                  child: Column(
+                    children: [
+                      SizedBox(
+                        height: 10,
+                      ),
+                      FiltersWidget(),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      MarkerplaceSelectorWidget(),
+                    ],
+                  ))),
+        ),
+        SliverPadding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          sliver: SliverListOfProductsWidget(),
+        )
+      ]),
     );
   }
 }
 
-class ProductsListViewWidget extends StatelessWidget {
-  const ProductsListViewWidget({
+class SliverListOfProductsWidget extends StatelessWidget {
+  const SliverListOfProductsWidget({
     super.key,
   });
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      shrinkWrap: true,
-      itemCount: 10,
-      itemBuilder: (context, index) {
-        return Container(
-          height: 100,
-          color: Colors.grey,
-          margin: const EdgeInsets.only(bottom: 10),
-        );
-      },
+    return SliverList.builder(itemCount: 10, itemBuilder: (context, index) {
+      return Container(
+        height: 200,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          color: Color.fromRGBO(106, 96, 96, 1),
+        ),
+        margin: const EdgeInsets.only(bottom: 10),
+        child: ProductCardWidget(),
+      );
+    },);
+  }
+}
+
+class ProductCardWidget extends StatelessWidget {
+  const ProductCardWidget({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return const Row(
+      children: [
+        Padding(
+          padding: EdgeInsets.all(15.0),
+          child: Placeholder(fallbackWidth: 150,),
+        ),
+        SizedBox(
+          width: 10,
+        ),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(height: 15,),
+            Text('Енергетик нонстоп',style: productCardTextStyle,),
+            SizedBox(height: 10,),
+            Text('Ціна:',style: productCardTextStyle),
+            SizedBox(height: 10,),
+            Text('% знижки:',style: productCardTextStyle),
+            SizedBox(height: 10,),
+            Text('Минула ціна:',style: productCardTextStyle),
+          ],
+        ),
+      ],
     );
   }
 }
@@ -70,42 +132,41 @@ class MarkerplaceSelectorWidget extends StatelessWidget {
         children: [
           Expanded(
             child: Container(
-              color: Colors.grey,
-              margin:  const EdgeInsets.only(right: 5),
-              child: TextButton(
-                  onPressed: () {}, child: const Text('Фора')),
+              decoration: defaultDecoration,
+              margin: const EdgeInsets.only(right: 5),
+              child: TextButton(onPressed: () {},style: buttonStyle, child: Text('Фора', style: defaultTextStyleOfMarkets)),
             ),
           ),
           Expanded(
             child: Container(
-              color: Colors.grey,
-              margin:  const EdgeInsets.symmetric(horizontal: 5),
-              child: TextButton(
-                  onPressed: () {}, child: const Text('Траш')),
+              decoration: defaultDecoration,
+              margin: const EdgeInsets.symmetric(horizontal: 5),
+              child: TextButton(onPressed: () {},style: buttonStyle, child:  Text('Траш', style: defaultTextStyleOfMarkets)),
             ),
           ),
           Expanded(
             child: Container(
-              color: Colors.grey,
-              margin:  const EdgeInsets.symmetric(horizontal: 5),
+              decoration: defaultDecoration,
+              margin: const EdgeInsets.symmetric(horizontal: 5),
               child: TextButton(
-                  onPressed: () {}, child: const Text('АТБ')),
+                  onPressed: () {},
+                  child: Text('АТБ', style: defaultTextStyleOfMarkets),
+                  style: buttonStyle)
             ),
           ),
           Expanded(
             child: Container(
-              color: Colors.grey,
-              margin:  const EdgeInsets.symmetric(horizontal: 5),
-              child: TextButton(
-                  onPressed: () {}, child: const Text('Сільпо')),
+              decoration: defaultDecoration,
+              margin: const EdgeInsets.symmetric(horizontal: 5),
+              child: TextButton(onPressed: () {},style: buttonStyle, child:  Text('Сільпо', style: defaultTextStyleOfMarkets)),
             ),
           ),
           Expanded(
               child: Container(
+                decoration: defaultDecoration,
                   margin: const EdgeInsets.only(left: 5),
-                  color: Colors.grey,
                   child:
-                      TextButton(onPressed: () {}, child: const Text('Вcі')))),
+                      TextButton(onPressed: () {},style: buttonStyle, child:  Text('Вcі', style: defaultTextStyleOfMarkets)))),
         ],
       ),
     );
@@ -120,26 +181,29 @@ class FiltersWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 120,
-      color: Colors.grey,
+      height: 130,
+      decoration: defaultDecoration,
       child: Column(
         children: [
           Row(
             children: [
               Expanded(
                 child: TextButton(
-                    onPressed: () {},
-                    child: const Text('Найбільша вигода')),
+                    onPressed: () {},style: buttonStyle, child:  Text('Найбільша вигода', style: defaultTextStyleOfSaleFilters,textAlign: TextAlign.center,)),
               ),
               Expanded(
                 child: TextButton(
-                    onPressed: () {}, child: const Text('Найдешевші')),
+                    onPressed: () {},style: buttonStyle, child:  Text('Найдешевші', style: defaultTextStyleOfSaleFilters)),
               ),
-              Expanded(child: TextButton(onPressed: () {}, child: const Text('Губи'))),
+              Expanded(
+                  child:
+                      TextButton(onPressed: () {},style: buttonStyle, child: Text('Губи', style: defaultTextStyleOfSaleFilters))),
             ],
           ),
-          const Divider(color: Colors.black,), 
-          FilledButton(onPressed: () {}, child: const Text('Фільтр'))
+          const Divider(
+            color: Colors.black,
+          ),
+          TextButton(onPressed: () {},style: buttonStyle, child: const Text('Фільтр', style: TextStyle(color: Colors.black, letterSpacing: 25,fontSize: 22),))
         ],
       ),
     );
