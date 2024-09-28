@@ -10,7 +10,8 @@ BoxDecoration defaultDecoration = BoxDecoration(
 );
 ButtonStyle buttonStyle = ButtonStyle(
   overlayColor: WidgetStatePropertyAll<Color>(Color.fromRGBO(106, 96, 96, 0.5),),
-  fixedSize: WidgetStatePropertyAll<Size>(Size.fromHeight(55)),
+  fixedSize: WidgetStatePropertyAll<Size>(Size.fromHeight(55),),
+  shape: WidgetStatePropertyAll( RoundedRectangleBorder(borderRadius: BorderRadius.circular(20),),),
 );
 
 
@@ -51,7 +52,7 @@ class MainScreen extends StatelessWidget {
                       SizedBox(
                         height: 10,
                       ),
-                      MarkerplaceSelectorWidget(),
+                      MarketplaceSelectorWidget(),
                     ],
                   ))),
         ),
@@ -96,7 +97,7 @@ class ProductCardWidget extends StatelessWidget {
       children: [
         Padding(
           padding: EdgeInsets.all(15.0),
-          child: Placeholder(fallbackWidth: 150,),
+          child: Placeholder(fallbackWidth: 120,),
         ),
         SizedBox(
           width: 10,
@@ -119,33 +120,36 @@ class ProductCardWidget extends StatelessWidget {
   }
 }
 
-class MarkerplaceSelectorWidget extends StatelessWidget {
-  const MarkerplaceSelectorWidget({
+class MarketplaceSelectorWidget extends StatelessWidget {
+  const MarketplaceSelectorWidget({
     super.key,
   });
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 70,
-      child: Row(
-        children: [
-          Expanded(
-            child: Container(
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: SizedBox(
+        height: 70,
+        child: Row(
+          
+          children: [
+            Container(
+              decoration: defaultDecoration,
+                margin: const EdgeInsets.only(right: 10),
+                child:
+                    TextButton(onPressed: () {},style: buttonStyle, child:  Text('Вcі', style: defaultTextStyleOfMarkets))),
+            Container(
               decoration: defaultDecoration,
               margin: const EdgeInsets.only(right: 5),
               child: TextButton(onPressed: () {},style: buttonStyle, child: Text('Фора', style: defaultTextStyleOfMarkets)),
             ),
-          ),
-          Expanded(
-            child: Container(
+            Container(
               decoration: defaultDecoration,
               margin: const EdgeInsets.symmetric(horizontal: 5),
               child: TextButton(onPressed: () {},style: buttonStyle, child:  Text('Траш', style: defaultTextStyleOfMarkets)),
             ),
-          ),
-          Expanded(
-            child: Container(
+            Container(
               decoration: defaultDecoration,
               margin: const EdgeInsets.symmetric(horizontal: 5),
               child: TextButton(
@@ -153,21 +157,14 @@ class MarkerplaceSelectorWidget extends StatelessWidget {
                   child: Text('АТБ', style: defaultTextStyleOfMarkets),
                   style: buttonStyle)
             ),
-          ),
-          Expanded(
-            child: Container(
+            
+            Container(
               decoration: defaultDecoration,
               margin: const EdgeInsets.symmetric(horizontal: 5),
               child: TextButton(onPressed: () {},style: buttonStyle, child:  Text('Сільпо', style: defaultTextStyleOfMarkets)),
             ),
-          ),
-          Expanded(
-              child: Container(
-                decoration: defaultDecoration,
-                  margin: const EdgeInsets.only(left: 5),
-                  child:
-                      TextButton(onPressed: () {},style: buttonStyle, child:  Text('Вcі', style: defaultTextStyleOfMarkets)))),
-        ],
+          ],
+        ),
       ),
     );
   }
