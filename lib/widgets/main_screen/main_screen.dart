@@ -9,8 +9,8 @@ BoxDecoration defaultDecoration = BoxDecoration(
   color: defaultColor,
 );
 ButtonStyle buttonStyle = ButtonStyle(
-  overlayColor: WidgetStatePropertyAll<Color>(Color.fromRGBO(106, 96, 96, 0.5),),
-  fixedSize: WidgetStatePropertyAll<Size>(Size.fromHeight(55),),
+  overlayColor: const WidgetStatePropertyAll<Color>(Color.fromRGBO(106, 96, 96, 0.5),),
+  fixedSize: const WidgetStatePropertyAll<Size>(Size.fromHeight(55),),
   shape: WidgetStatePropertyAll( RoundedRectangleBorder(borderRadius: BorderRadius.circular(20),),),
 );
 
@@ -56,8 +56,8 @@ class MainScreen extends StatelessWidget {
                     ],
                   ))),
         ),
-        SliverPadding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
+        const SliverPadding(
+          padding: EdgeInsets.symmetric(horizontal: 20),
           sliver: SliverListOfProductsWidget(),
         )
       ]),
@@ -77,10 +77,10 @@ class SliverListOfProductsWidget extends StatelessWidget {
         height: 200,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
-          color: Color.fromRGBO(106, 96, 96, 1),
+          color: const Color.fromRGBO(106, 96, 96, 1),
         ),
         margin: const EdgeInsets.only(bottom: 10),
-        child: ProductCardWidget(),
+        child: const ProductCardWidget(),
       );
     },);
   }
@@ -138,30 +138,29 @@ class MarketplaceSelectorWidget extends StatelessWidget {
               decoration: defaultDecoration,
                 margin: const EdgeInsets.only(right: 10),
                 child:
-                    TextButton(onPressed: () {},style: buttonStyle, child:  Text('Вcі', style: defaultTextStyleOfMarkets))),
+                    TextButton(onPressed: () {},style: buttonStyle, child:  const Text('Вcі', style: defaultTextStyleOfMarkets))),
             Container(
               decoration: defaultDecoration,
               margin: const EdgeInsets.only(right: 5),
-              child: TextButton(onPressed: () {},style: buttonStyle, child: Text('Фора', style: defaultTextStyleOfMarkets)),
+              child: TextButton(onPressed: () {},style: buttonStyle, child: const Text('Фора', style: defaultTextStyleOfMarkets)),
             ),
             Container(
               decoration: defaultDecoration,
               margin: const EdgeInsets.symmetric(horizontal: 5),
-              child: TextButton(onPressed: () {},style: buttonStyle, child:  Text('Траш', style: defaultTextStyleOfMarkets)),
+              child: TextButton(onPressed: () {},style: buttonStyle, child:  const Text('Траш', style: defaultTextStyleOfMarkets)),
             ),
             Container(
               decoration: defaultDecoration,
               margin: const EdgeInsets.symmetric(horizontal: 5),
               child: TextButton(
                   onPressed: () {},
-                  child: Text('АТБ', style: defaultTextStyleOfMarkets),
-                  style: buttonStyle)
-            ),
-            
+                  style: buttonStyle,
+                  child: const Text('АТБ', style: defaultTextStyleOfMarkets))
+            ),     
             Container(
               decoration: defaultDecoration,
               margin: const EdgeInsets.symmetric(horizontal: 5),
-              child: TextButton(onPressed: () {},style: buttonStyle, child:  Text('Сільпо', style: defaultTextStyleOfMarkets)),
+              child: TextButton(onPressed: () {},style: buttonStyle, child:  const Text('Сільпо', style: defaultTextStyleOfMarkets)),
             ),
           ],
         ),
@@ -186,15 +185,15 @@ class FiltersWidget extends StatelessWidget {
             children: [
               Expanded(
                 child: TextButton(
-                    onPressed: () {},style: buttonStyle, child:  Text('Найбільша вигода', style: defaultTextStyleOfSaleFilters,textAlign: TextAlign.center,)),
+                    onPressed: () {},style: buttonStyle, child:  const Text('Найбільша вигода', style: defaultTextStyleOfSaleFilters,textAlign: TextAlign.center,)),
               ),
               Expanded(
                 child: TextButton(
-                    onPressed: () {},style: buttonStyle, child:  Text('Найдешевші', style: defaultTextStyleOfSaleFilters)),
+                    onPressed: () {},style: buttonStyle, child:  const Text('Найдешевші', style: defaultTextStyleOfSaleFilters)),
               ),
               Expanded(
                   child:
-                      TextButton(onPressed: () {},style: buttonStyle, child: Text('Губи', style: defaultTextStyleOfSaleFilters))),
+                      TextButton(onPressed: () {},style: buttonStyle, child: const Text('Губи', style: defaultTextStyleOfSaleFilters))),
             ],
           ),
           const Divider(
