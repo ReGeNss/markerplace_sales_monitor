@@ -10,6 +10,7 @@ class InternetConnectionHandler{
         throw Exception('Failed to load data: ${response.statusCode}'); 
       }
       client.close();
+      print('data loaded from internet');
       return response.body;
     } catch (e) {
       throw Exception('Failed to load data: $e'); 
