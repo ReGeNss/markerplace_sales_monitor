@@ -9,10 +9,11 @@ final Decoration selectedElement = BoxDecoration(
   borderRadius: BorderRadius.circular(20),
   color: const Color.fromRGBO(106, 96, 96, 0.9),
 );
+
 const TextStyle defaultTextStyleOfMarkets =
-    TextStyle(color: Colors.black, fontSize: 12);
-const TextStyle defaultTextStyleOfSaleFilters =
     TextStyle(color: Colors.black, fontSize: 15);
+const TextStyle defaultTextStyleOfSaleFilters =
+    TextStyle(color: Colors.black, fontSize: 17);
 const TextStyle productCardTextStyle =
     TextStyle(color: Colors.white, fontSize: 15);
 const Color defaultColor = Color.fromRGBO(217, 217, 217, 1);
@@ -30,6 +31,25 @@ ButtonStyle buttonStyle = ButtonStyle(
   shape: WidgetStatePropertyAll(
     RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(20),
+    ),
+  ),
+);
+
+
+
+ButtonStyle bigFilterButtonStyle = const ButtonStyle(
+  overlayColor:  WidgetStatePropertyAll<Color>(
+    Color.fromRGBO(106, 96, 96, 0.5),
+  ),
+  fixedSize:  WidgetStatePropertyAll<Size>(
+    Size(2000,60),
+  ),
+  shape: WidgetStatePropertyAll(
+    RoundedRectangleBorder(
+      borderRadius: BorderRadius.only(
+        bottomLeft: Radius.circular(20),
+        bottomRight: Radius.circular(20),
+      ),
     ),
   ),
 );
@@ -66,7 +86,7 @@ class MainScreen extends StatelessWidget {
             pinned: true,
             floating: true,
             bottom: PreferredSize(
-                preferredSize: Size.fromHeight(250),
+                preferredSize: Size.fromHeight(255),
                 child: Padding(
                     padding: EdgeInsets.only(bottom: 0, left: 20, right: 20),
                     child: Column(
@@ -105,11 +125,11 @@ class SliverListOfProductsWidget extends StatelessWidget {
     final bloc = BlocProvider.of<MainScreenBloc>(context);
     return BlocBuilder<MainScreenBloc, MainScreenState>(
       builder: (context, state) {
-        print('rebuilding list of products');
+        // print('rebuilding list of products');
         if (state is LoadingData) {
           return const SliverToBoxAdapter(
             // child: SizedBox(height: 100, width: 100,child: CircularProgressIndicator()),
-            child: Center(child: Text('Накачування ваших губ ботоксом...')),
+            child: Center(child: Text('Накачування ваших губ ботоксом...', style: TextStyle(fontSize: 27,fontWeight: FontWeight.bold,),textAlign: TextAlign.center,)),
           );
         }
         return SliverList.builder(
@@ -141,69 +161,97 @@ class ProductCardWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bloc = BlocProvider.of<MainScreenBloc>(context);
-    return Row(
-      children: [
-        Column(
-          children: [
-            bloc.getCurrentMarketplace(productCard.title) != null
-                ? Padding(
-                  padding: const EdgeInsets.only(top:5.0),
-                  child: Text(
-                      bloc.getCurrentMarketplace(productCard.title)!,
-                      style: productCardTextStyle,
+    return Padding(
+      padding: const EdgeInsets.only(right: 10),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(top:5.0),
+                child: bloc.getCurrentMarketplace(productCard.title) != null
+                    ? Text(
+                        bloc.getCurrentMarketplace(productCard.title)!,
+                        style: const TextStyle(color: Colors.white, fontSize: 17),
+                      )
+                    : const SizedBox(height: 21),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(15.0),
+                child: Image.network(
+                  productCard.imgSrc,
+                  width: 120,
+                  height: 120,
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) {
+                      return child;
+                    } else {
+                      return const SizedBox(
+                        width: 120,
+                        height: 120,
+                        child: Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                      );
+                    }
+                  },
+                  errorBuilder: (context, error, stackTrace) => const SizedBox(
+                    width: 120,
+                    height: 120,
+                    child: Center(
+                      child: Text('Зображення відсутнє',style: productCardTextStyle,textAlign: TextAlign.center,),
                     ),
-                )
-                : const SizedBox(),
-            Padding(
-              padding: const EdgeInsets.all(15.0),
-              child: Image.network(
-                productCard.imgSrc,
-                width: 120,
-                height: 120,
+                ),
               ),
+              )
+            ],
+          ),
+          const SizedBox(
+            width: 10,
+          ),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(
+                  height: 15,
+                ),
+                SizedBox(
+                  child: Text(
+                    productCard.title,
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                    style: productCardTextStyle,
+                  ),
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                Text('Ціна: ${productCard.currentPrice}',
+                    style: productCardTextStyle),
+                const SizedBox(
+                  height: 10,
+                ),
+                productCard.percentOfSale != null
+                    ? Text('% знижки: ${productCard.percentOfSale}',
+                        style: productCardTextStyle)
+                    : const SizedBox(),
+                const SizedBox(
+                  height: 10,
+                ),
+                productCard.oldPrice != null
+                    ? SizedBox(
+                      width: 135,
+                      child: Text('Минула ціна: ${productCard.oldPrice}',maxLines: 2,overflow: TextOverflow.ellipsis,
+                          style: productCardTextStyle),
+                    )
+                    : const SizedBox(),
+              ],
             ),
-          ],
-        ),
-        const SizedBox(
-          width: 10,
-        ),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(
-              height: 15,
-            ),
-            SizedBox(
-              width: 135,
-              child: Text(
-                productCard.title,
-                maxLines: 4,
-                overflow: TextOverflow.ellipsis,
-                style: productCardTextStyle,
-              ),
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            Text('Ціна: ${productCard.currentPrice}',
-                style: productCardTextStyle),
-            const SizedBox(
-              height: 10,
-            ),
-            productCard.percentOfSale != null
-                ? Text('% знижки: ${productCard.percentOfSale}',
-                    style: productCardTextStyle)
-                : const SizedBox(),
-            const SizedBox(
-              height: 10,
-            ),
-            productCard.oldPrice != null
-                ? Text('Минула ціна: ${productCard.oldPrice}',
-                    style: productCardTextStyle)
-                : const SizedBox(),
-          ],
-        ),
-      ],
+          ),
+        ],
+      ),
     );
   }
 }
@@ -219,7 +267,10 @@ class MarketplaceSelectorWidget extends StatelessWidget {
     return BlocBuilder<MainScreenBloc, MainScreenState>(
       builder: (context, state) {
         if (state is LoadingData) {
-          return const SizedBox(height: 55, child: CircularProgressIndicator());
+          return const SizedBox(
+            width: 100,
+            height: 100,
+            child: Center(child: CircularProgressIndicator()));
         }
         return Row(
           children: [
@@ -247,7 +298,7 @@ class MarketplaceSelectorWidget extends StatelessWidget {
                 height: 55,
                 child: BlocBuilder<MainScreenBloc, MainScreenState>(
                   builder: (context, state) {
-                    print('rebuilding');
+                    // print('rebuilding');
                     return ListView.builder(
                       scrollDirection: Axis.horizontal,
                       itemCount: bloc.countOfCategories,
@@ -264,7 +315,7 @@ class MarketplaceSelectorWidget extends StatelessWidget {
                               },
                               style: buttonStyle,
                               child: Text(
-                                bloc.categoryList[index],
+                                bloc.marketsList[index],
                                 style: defaultTextStyleOfMarkets,
                               )),
                         );
@@ -290,7 +341,7 @@ class FiltersWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final bloc = BlocProvider.of<MainScreenBloc>(context);
     return Container(
-      height: 115,
+      height: 121,
       decoration: defaultDecoration,
       child: Column(
         children: [
@@ -304,13 +355,31 @@ class FiltersWidget extends StatelessWidget {
                   builder: (context, state) {
                     return Container(
                       decoration: state is BiggestSaleCategorySelected
-                          ? selectedElement
+                          ? const BoxDecoration(
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(20),
+                              ),
+                              color: Color.fromRGBO(106, 96, 96, 0.9),
+                            )
                           : null,
                       child: TextButton(
                           onPressed: () {
                             bloc.add(const BiggestSaleCategoryButtonTapEvent());
                           },
-                          style: buttonStyle,
+                          style: const ButtonStyle(
+                            overlayColor: WidgetStatePropertyAll<Color>(
+                              Color.fromRGBO(106, 96, 96, 0.5),
+                            ),
+                            fixedSize: WidgetStatePropertyAll<Size>(
+                              Size.fromHeight(60),
+                            ),
+                            shape: WidgetStatePropertyAll(
+                              RoundedRectangleBorder(
+                                borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(20)),
+                              ),
+                            ),
+                          ),
                           child: const Text(
                             'Найбільша вигода',
                             style: defaultTextStyleOfSaleFilters,
@@ -325,14 +394,32 @@ class FiltersWidget extends StatelessWidget {
                   builder: (context, state) {
                     return Container(
                       decoration: state is SmallestPriceCategorySelected
-                          ? selectedElement
+                          ? const BoxDecoration(
+                              borderRadius: BorderRadius.only(
+                                topRight: Radius.circular(20),
+                              ),
+                              color: Color.fromRGBO(106, 96, 96, 0.9),
+                            )
                           : null,
                       child: TextButton(
                           onPressed: () {
                             bloc.add(
                                 const SmallestPriceCategoryButtonTapEvent());
                           },
-                          style: buttonStyle,
+                          style: const ButtonStyle(
+                            overlayColor: WidgetStatePropertyAll<Color>(
+                              Color.fromRGBO(106, 96, 96, 0.5),
+                            ),
+                            fixedSize: WidgetStatePropertyAll<Size>(
+                              Size.fromHeight(60),
+                            ),
+                            shape: WidgetStatePropertyAll(
+                              RoundedRectangleBorder(
+                                borderRadius: BorderRadius.only(
+                                    topRight: Radius.circular(20)),
+                              ),
+                            ),
+                          ),
                           child: const Text('Найдешевші',
                               style: defaultTextStyleOfSaleFilters)),
                     );
@@ -355,11 +442,14 @@ class FiltersWidget extends StatelessWidget {
             height: 1,
             color: Colors.black,
           ),
+          // const SizedBox(
+          //   height: 5,
+          // ),
           TextButton(
               onPressed: () {
                 bloc.add(const FilterButtonTapEvent());
               },
-              style: buttonStyle,
+              style: bigFilterButtonStyle,
               child: const Text(
                 'Фільтр',
                 style: TextStyle(

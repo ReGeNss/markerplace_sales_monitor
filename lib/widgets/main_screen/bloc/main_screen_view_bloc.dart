@@ -10,7 +10,11 @@ class MainScreenBloc extends Bloc<MainScreenEvents, MainScreenState>{
   get productList  {
     return _productList;
   } 
-  final List<String> categoryList = []; 
+  set productLisTestingtSet(List<ProductCard> list){
+    _productList.clear();
+    _productList.addAll(list);
+  }
+  final List<String> marketsList = []; 
   int? selectedMarketplace; // null means all marketplaces
 
   MainScreenBloc() : super(LoadingData()){
@@ -27,14 +31,16 @@ class MainScreenBloc extends Bloc<MainScreenEvents, MainScreenState>{
     on<LoadingDataCompletedEvent>(_loadingDataCompletedEvent);
   }
 
-  void createCategoryList(){
+  void createMarketsList(){
     marketplaceList.forEach((e){
       final name = e.marketplace; 
-      categoryList.add(name);
+      marketsList.add(name);
     }); 
   }
 
   void _createAllMarketsProductsList(){
+    _productList.clear(); 
+    print('${_productList.length} createAllMarketsProductsList call');
     for(var e in marketplaceList){
       for(var product in e.products){
         _productList.add(product);
@@ -42,9 +48,10 @@ class MainScreenBloc extends Bloc<MainScreenEvents, MainScreenState>{
     }
   }
 
-  void _selectMarketplace(int index){
+  void _selectMarketplace(int? index){
+    if( index == null) {_createAllMarketsProductsList(); return;}
     selectedMarketplace = index;
-    final selectedMarketplaceName = categoryList[index];
+    final selectedMarketplaceName = marketsList[index];
     final selectedMarketplaceData = marketplaceList.firstWhere((element) => element.marketplace == selectedMarketplaceName);
     _productList.clear();
     _productList.addAll(selectedMarketplaceData.products);
@@ -53,12 +60,14 @@ class MainScreenBloc extends Bloc<MainScreenEvents, MainScreenState>{
   void rebuildProductList(MainScreenState newState){
     switch(newState){
       case BiggestSaleCategorySelected _:
-        final newList =_biggestSaleCategoryListBuild(_productList);
+        _selectMarketplace(selectedMarketplace);
+        final newList =_biggestSaleCategoryListBuild(_productList).toList();
         _productList.clear();
         _productList.addAll(newList);
         break;
       case SmallestPriceCategorySelected _:
-        final newList = _smallestPriceFilte(_productList); 
+        _selectMarketplace(selectedMarketplace);
+        final newList = _smallestPriceFilter(_productList).toList(); 
         _productList.clear();
         _productList.addAll(newList);
         break;
@@ -68,13 +77,13 @@ class MainScreenBloc extends Bloc<MainScreenEvents, MainScreenState>{
     }
   }
 
-  List<ProductCard> _smallestPriceFilte(List<ProductCard> productList){
-    final newList = List<ProductCard>.from(productList);
-    newList.sort((a,b) => a.getCurrentPriceAsDouble().compareTo(b.getCurrentPriceAsDouble()));
-    return newList;
-  }
+  List<ProductCard> _smallestPriceFilter(List<ProductCard> productList) {
+  final newList = productList.toSet().toList();
+  newList.sort((a, b) => a.getCurrentPriceAsDouble().compareTo(b.getCurrentPriceAsDouble()));
+  return newList;
+}
 
-  get countOfCategories => categoryList.length;
+  get countOfCategories => marketsList.length;
   get countOfProducts => _productList.length;
 
   String? getCurrentMarketplace(String title) {
@@ -94,11 +103,11 @@ class MainScreenBloc extends Bloc<MainScreenEvents, MainScreenState>{
   }
 
   void _onAllCategoryButtonTapEvent(AllCategoryButtonTapEvent event, Emitter<MainScreenState> emit){
-    final old = productList.toList(); 
+    // final old = productList.toList(); 
     selectedMarketplace = null;
     _createAllMarketsProductsList();
     rebuildProductList(state); 
-    print(productList == old);
+    // print(productList == old);
     emit(state.copyWith());
   }
 
@@ -113,14 +122,22 @@ class MainScreenBloc extends Bloc<MainScreenEvents, MainScreenState>{
     emit(BiggestSaleCategorySelected());
   }
 
-  List<ProductCard> _biggestSaleCategoryListBuild(List <ProductCard> productList){
-    final productListWithSale = <ProductCard>[];
-    _productList.forEach((e){
-        if(e.percentOfSale != null) productListWithSale.add(e);
-    });
-    productListWithSale.sort((a,b) => b.percentOfSale!.compareTo(a.percentOfSale!));
-    return productListWithSale;
-  }
+  // List<ProductCard> _biggestSaleCategoryListBuild(List <ProductCard> productList){
+  //   final productListWithSale = <ProductCard>[];
+  //   productList.forEach((e){
+  //       // if(e.title == 'Солодка енергія') print(e);
+  //       if(e.percentOfSale != null && e.oldPrice != null) productListWithSale.add(e);
+  //   });
+  //   productListWithSale.sort((a,b) => b.percentOfSale!.compareTo(a.percentOfSale!));
+  //   // productListWithSale.forEach((e) => print(e.percentOfSale));
+  //   return productListWithSale;
+  // }
+
+List<ProductCard> _biggestSaleCategoryListBuild(List<ProductCard> productList) {
+  final productListWithSale = productList.where((e) => e.percentOfSale != null).toList();
+  productListWithSale.sort((a, b) => b.percentOfSale!.compareTo(a.percentOfSale!));
+  return productListWithSale;
+}
 
   void _smallestPriceCategoryButtonTapEvent(SmallestPriceCategoryButtonTapEvent event, Emitter<MainScreenState> emit){
     rebuildProductList(SmallestPriceCategorySelected()); 
@@ -128,7 +145,6 @@ class MainScreenBloc extends Bloc<MainScreenEvents, MainScreenState>{
   }
 
   void _lipsPriceCategoryButtonTapEvent(LipsPriceCategoryButtonTapEvent event, Emitter<MainScreenState> emit){
-    print('lips button tap');
     emit(state);
   }
 
@@ -138,9 +154,9 @@ class MainScreenBloc extends Bloc<MainScreenEvents, MainScreenState>{
 
   void _loadingDataCompletedEvent(LoadingDataCompletedEvent event, Emitter<MainScreenState> emit){
     marketplaceList = event.data;
-    createCategoryList();
-    _createAllMarketsProductsList(); 
-    add(BiggestSaleCategoryButtonTapEvent());
+    createMarketsList();
+    // _createAllMarketsProductsList(); 
+    add(const BiggestSaleCategoryButtonTapEvent());
     // emit(BiggestSaleCategorySelected());
   }
 

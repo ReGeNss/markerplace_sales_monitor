@@ -37,7 +37,7 @@ class ProductCard{
   final String currentPrice;
   final String? oldPrice; 
   final String imgSrc;
-  late final String? percentOfSale;
+  late final int? percentOfSale;
 
   factory ProductCard.fromJson(Map<String, dynamic> json) => _$ProductCardFromJson(json);
 
@@ -47,8 +47,9 @@ class ProductCard{
     return double.parse(price);
   }
   double getOldPriceAsDouble(){
-    if(oldPrice == null){
-      throw Error(); 
+    // print('$this ${oldPrice == null}' ); 
+    if(oldPrice == null ){
+      throw Error();
     }
     final price = oldPrice!.split(' ')[0].replaceAll(',', '.');
     final parsedPrice = double.parse(price);
@@ -56,10 +57,13 @@ class ProductCard{
   }
 
   ProductCard(this.title, this.currentPrice, this.oldPrice, this.imgSrc){
-    if(oldPrice == null) {percentOfSale = null; return; }; 
+    if(oldPrice == null || oldPrice!.isEmpty || oldPrice == 'null') {percentOfSale = null; return; }; // TODO: FIX IN FUTURE
     final current= getCurrentPriceAsDouble();
     final old = getOldPriceAsDouble();
     final percent = 100 - ((current / old) * 100);
-    percentOfSale = percent.toStringAsFixed(0);
+    percentOfSale = percent.toInt();
   } 
+
+  @override 
+  String toString() => 'title: $title, currentPrice: $currentPrice, oldPrice: $oldPrice, imgSrc: $imgSrc, percentOfSale: $percentOfSale';
 }
