@@ -30,10 +30,13 @@ migrate_working_dir/
 .pub-cache/
 .pub/
 /build/
+/linux/
+/web/
+/windows/
+/macos/
 
 # Symbolication related
 app.*.symbols
-
 # Obfuscation related
 app.*.map.json
 

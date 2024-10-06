@@ -10,10 +10,7 @@ class MainScreenBloc extends Bloc<MainScreenEvents, MainScreenState>{
   get productList  {
     return _productList;
   } 
-  set productLisTestingtSet(List<ProductCard> list){
-    _productList.clear();
-    _productList.addAll(list);
-  }
+
   final List<String> marketsList = []; 
   int? selectedMarketplace; // null means all marketplaces
 
@@ -121,17 +118,6 @@ class MainScreenBloc extends Bloc<MainScreenEvents, MainScreenState>{
     rebuildProductList(BiggestSaleCategorySelected()); 
     emit(BiggestSaleCategorySelected());
   }
-
-  // List<ProductCard> _biggestSaleCategoryListBuild(List <ProductCard> productList){
-  //   final productListWithSale = <ProductCard>[];
-  //   productList.forEach((e){
-  //       // if(e.title == 'Солодка енергія') print(e);
-  //       if(e.percentOfSale != null && e.oldPrice != null) productListWithSale.add(e);
-  //   });
-  //   productListWithSale.sort((a,b) => b.percentOfSale!.compareTo(a.percentOfSale!));
-  //   // productListWithSale.forEach((e) => print(e.percentOfSale));
-  //   return productListWithSale;
-  // }
 
 List<ProductCard> _biggestSaleCategoryListBuild(List<ProductCard> productList) {
   final productListWithSale = productList.where((e) => e.percentOfSale != null).toList();
