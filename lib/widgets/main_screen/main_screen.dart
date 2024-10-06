@@ -78,7 +78,7 @@ class MainScreen extends StatelessWidget {
               ),
             ),
           ),
-          const SliverAppBar(
+           SliverAppBar(
             surfaceTintColor: Colors.transparent,
             toolbarHeight: 0,
             snap: true,
@@ -86,20 +86,43 @@ class MainScreen extends StatelessWidget {
             pinned: true,
             floating: true,
             bottom: PreferredSize(
-                preferredSize: Size.fromHeight(255),
+                preferredSize: const Size.fromHeight(290),
                 child: Padding(
-                    padding: EdgeInsets.only(bottom: 0, left: 20, right: 20),
+                    padding: const EdgeInsets.only(bottom: 0, left: 20, right: 20),
                     child: Column(
                       children: [
-                        SizedBox(
+                        const SizedBox(
+                          height: 25,
+                        ),
+                        TextField(
+                          decoration: InputDecoration(
+                            filled: true,
+                            fillColor: defaultColor,
+                            hintText: 'Пошук',
+                            prefixIcon: const Icon(Icons.search),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(20),
+                              borderSide: const BorderSide(
+                                width: 2,
+                                color: Color.fromRGBO(106, 96, 96, 1),
+                              ),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(20),
+                              borderSide: const BorderSide(
+                                width: 2,
+                                color: defaultColor,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 10,),
+                        const FiltersWidget(),
+                        const SizedBox(
                           height: 10,
                         ),
-                        FiltersWidget(),
-                        SizedBox(
-                          height: 10,
-                        ),
-                        MarketplaceSelectorWidget(),
-                        SizedBox(
+                        const MarketplaceSelectorWidget(),
+                        const SizedBox(
                           height: 10,
                         ),
                       ],
@@ -268,8 +291,8 @@ class MarketplaceSelectorWidget extends StatelessWidget {
       builder: (context, state) {
         if (state is LoadingData) {
           return const SizedBox(
-            width: 100,
-            height: 100,
+            width: 55,
+            height: 55,
             child: Center(child: CircularProgressIndicator()));
         }
         return Row(

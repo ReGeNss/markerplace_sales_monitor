@@ -57,7 +57,7 @@ class ProductCard{
   }
 
   ProductCard(this.title, this.currentPrice, this.oldPrice, this.imgSrc){
-    if(oldPrice == null || oldPrice!.isEmpty || oldPrice == 'null') {percentOfSale = null; return; }; // TODO: FIX IN FUTURE
+    if(oldPrice == null || oldPrice!.isEmpty || oldPrice == 'null') {percentOfSale = null; return; } // TODO: FIX IN FUTURE
     final current= getCurrentPriceAsDouble();
     final old = getOldPriceAsDouble();
     final percent = 100 - ((current / old) * 100);
