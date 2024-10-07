@@ -15,7 +15,7 @@ class DataHandler {
     for(var e in dataJson){
       data.add(MarketplaceData.fromJson(e));
     }
-    return data; // TODO: return all data  
+    return data;
   }
 
 }

@@ -7,6 +7,8 @@ class MainScreenBloc extends Bloc<MainScreenEvents, MainScreenState>{
   static final DataHandler _dataHandler = DataHandler();
   late final List<MarketplaceData> marketplaceList;
   final _productList = <ProductCard>[]; 
+  String _searchQuery = ''; 
+
   get productList  {
     return _productList;
   } 
@@ -23,6 +25,7 @@ class MainScreenBloc extends Bloc<MainScreenEvents, MainScreenState>{
     on<BiggestSaleCategoryButtonTapEvent>(_biggestSaleCategoryButtonTapEvent);
     on<SmallestPriceCategoryButtonTapEvent>(_smallestPriceCategoryButtonTapEvent); 
     on<FilterButtonTapEvent>(_filterButtonTapEvent);
+    on<SearchTextFieldChangedEvent>(_searchTextFieldChangedEvent); 
     on<LoadingDataCompletedEvent>(_loadingDataCompletedEvent);
   }
 
@@ -48,25 +51,25 @@ class MainScreenBloc extends Bloc<MainScreenEvents, MainScreenState>{
     _addDataToProductList(products);
   }
 
-  void _selectMarketplace(int? index){
-    if( index == null) {_createAllMarketsProductsList(); return;}
+  List<ProductCard> _selectMarketplace(int? index){
+    if( index == null) {_createAllMarketsProductsList(); return _productList;}
     selectedMarketplace = index;
     final selectedMarketplaceName = marketsList[index];
-    final selectedMarketplaceData = marketplaceList.firstWhere((element) => element.marketplace == selectedMarketplaceName);
-    _addDataToProductList(selectedMarketplaceData.products);
+    final selectedMarketplaceData = marketplaceList.firstWhere((element) => element.marketplace == selectedMarketplaceName); 
+    return selectedMarketplaceData.products; 
   }
 
   void rebuildProductList(MainScreenState newState){
     switch(newState){
       case BiggestSaleCategorySelected _:
-        _selectMarketplace(selectedMarketplace);
-        final newList =_biggestSaleCategoryListBuild(_productList).toList();
-        _addDataToProductList(newList); 
+        final productList= _selectMarketplace(selectedMarketplace);
+        final newList =_biggestSaleCategoryListBuild(productList).toList();
+        filterListBySearchQuery(productList: newList);
         break;
       case SmallestPriceCategorySelected _:
-        _selectMarketplace(selectedMarketplace);
-        final newList = _smallestPriceFilter(_productList).toList(); 
-        _addDataToProductList(newList); 
+        final productList= _selectMarketplace(selectedMarketplace);
+        final newList = _smallestPriceFilter(productList).toList(); 
+        filterListBySearchQuery(productList: newList); 
         break;
     }
   }
@@ -96,6 +99,28 @@ class MainScreenBloc extends Bloc<MainScreenEvents, MainScreenState>{
     return null;
   }
 
+  void _searchTextFieldChangedEvent(SearchTextFieldChangedEvent event, Emitter<MainScreenState> emit){
+    final searchQuery = event.text;
+    _searchQuery = searchQuery; 
+    if(event.text.isEmpty){
+      rebuildProductList(state);
+      emit(state.copyWith());
+      return;
+    }
+    filterListBySearchQuery(searchQuery: searchQuery, productList: _productList);
+    emit(state.copyWith());
+  }
+
+  void filterListBySearchQuery({String? searchQuery, required List<ProductCard> productList}){
+    if(_searchQuery.isEmpty) {
+      _addDataToProductList(productList);
+      return;
+    } 
+    final searchQuery = _searchQuery.toLowerCase(); 
+    final filteredList = productList.where((element) => (element.title.toLowerCase()).contains(searchQuery)).toList();
+    _addDataToProductList(filteredList);
+  }
+
   void _onAllCategoryButtonTapEvent(AllCategoryButtonTapEvent event, Emitter<MainScreenState> emit){ 
     selectedMarketplace = null;
     _createAllMarketsProductsList();
@@ -110,7 +135,7 @@ class MainScreenBloc extends Bloc<MainScreenEvents, MainScreenState>{
   }
 
   void _biggestSaleCategoryButtonTapEvent(BiggestSaleCategoryButtonTapEvent event, Emitter<MainScreenState> emit){
-    rebuildProductList(BiggestSaleCategorySelected()); 
+    rebuildProductList(BiggestSaleCategorySelected());
     emit(BiggestSaleCategorySelected());
   }
 
@@ -124,7 +149,6 @@ class MainScreenBloc extends Bloc<MainScreenEvents, MainScreenState>{
     rebuildProductList(SmallestPriceCategorySelected()); 
     emit(SmallestPriceCategorySelected());
   }
-
 
   void _filterButtonTapEvent(FilterButtonTapEvent event, Emitter<MainScreenState> emit){
     // emit(state);

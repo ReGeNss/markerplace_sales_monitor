@@ -10,6 +10,7 @@ class LoadingData extends MainScreenState {
 }
 
 class BiggestSaleCategorySelected extends MainScreenState {
+
   @override
   BiggestSaleCategorySelected copyWith() {
     return BiggestSaleCategorySelected();
@@ -18,6 +19,7 @@ class BiggestSaleCategorySelected extends MainScreenState {
 
 class SmallestPriceCategorySelected extends MainScreenState {
 
+  SmallestPriceCategorySelected();
   @override
   SmallestPriceCategorySelected copyWith() {
     return SmallestPriceCategorySelected();

@@ -33,6 +33,11 @@ class FilterButtonTapEvent extends MainScreenEvents{
   const FilterButtonTapEvent(); 
 }
 
+class SearchTextFieldChangedEvent extends MainScreenEvents{ 
+  final String text; 
+  const SearchTextFieldChangedEvent(this.text); 
+}
+
 class LoadingDataCompletedEvent extends MainScreenEvents{ 
   final List<MarketplaceData> data; 
   const LoadingDataCompletedEvent(this.data); 

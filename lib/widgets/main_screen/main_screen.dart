@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:markerplace_sales_monitor/repositores/data_handler.dart';
@@ -78,7 +80,7 @@ class MainScreen extends StatelessWidget {
               ),
             ),
           ),
-           SliverAppBar(
+          const SliverAppBar(
             surfaceTintColor: Colors.transparent,
             toolbarHeight: 0,
             snap: true,
@@ -86,43 +88,22 @@ class MainScreen extends StatelessWidget {
             pinned: true,
             floating: true,
             bottom: PreferredSize(
-                preferredSize: const Size.fromHeight(290),
+                preferredSize: Size.fromHeight(290),
                 child: Padding(
-                    padding: const EdgeInsets.only(bottom: 0, left: 20, right: 20),
+                    padding: EdgeInsets.only(bottom: 0, left: 20, right: 20),
                     child: Column(
                       children: [
-                        const SizedBox(
+                        SizedBox(
                           height: 25,
                         ),
-                        TextField(
-                          decoration: InputDecoration(
-                            filled: true,
-                            fillColor: defaultColor,
-                            hintText: 'Пошук',
-                            prefixIcon: const Icon(Icons.search),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(20),
-                              borderSide: const BorderSide(
-                                width: 2,
-                                color: Color.fromRGBO(106, 96, 96, 1),
-                              ),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(20),
-                              borderSide: const BorderSide(
-                                width: 2,
-                                color: defaultColor,
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 10,),
-                        const FiltersWidget(),
-                        const SizedBox(
+                        SearchTextFieldWidget(),
+                        SizedBox(height: 10,),
+                        FiltersWidget(),
+                        SizedBox(
                           height: 10,
                         ),
-                        const MarketplaceSelectorWidget(),
-                        const SizedBox(
+                        MarketplaceSelectorWidget(),
+                        SizedBox(
                           height: 10,
                         ),
                       ],
@@ -134,6 +115,51 @@ class MainScreen extends StatelessWidget {
           )
         ]),
       ),
+    );
+  }
+}
+
+class SearchTextFieldWidget extends StatelessWidget {
+  const SearchTextFieldWidget({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final bloc = BlocProvider.of<MainScreenBloc>(context); 
+    Timer? timer;
+    final textFieldFocus = FocusNode(); 
+    return TextField(
+      focusNode: textFieldFocus,
+      decoration: InputDecoration(
+        filled: true,
+        fillColor: defaultColor,
+        hintText: 'Пошук',
+        prefixIcon: const Icon(Icons.search),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(20),
+          borderSide: const BorderSide(
+            width: 2,
+            color: Color.fromRGBO(106, 96, 96, 1),
+          ),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(20),
+          borderSide: const BorderSide(
+            width: 2,
+            color: defaultColor,
+          ),
+        ),
+      ),
+      onChanged: (value) {
+        if(timer !=null){
+          if(timer!.isActive) {timer!.cancel();}
+        }
+        timer = Timer(const Duration(milliseconds: 400), () => bloc.add(SearchTextFieldChangedEvent(value))); 
+      },
+      onEditingComplete: () {
+        textFieldFocus.unfocus();
+      },
     );
   }
 }
