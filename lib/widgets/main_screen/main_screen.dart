@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:markerplace_sales_monitor/repositores/data_handler.dart';
@@ -15,7 +16,7 @@ final Decoration selectedElement = BoxDecoration(
 const TextStyle defaultTextStyleOfMarkets =
     TextStyle(color: Colors.black, fontSize: 15);
 const TextStyle defaultTextStyleOfSaleFilters =
-    TextStyle(color: Colors.black, fontSize: 17);
+    TextStyle(color: Colors.black, fontSize: 17, fontWeight: FontWeight.w500);
 const TextStyle productCardTextStyle =
     TextStyle(color: Colors.white, fontSize: 15);
 const Color defaultColor = Color.fromRGBO(217, 217, 217, 1);
@@ -80,7 +81,8 @@ class MainScreen extends StatelessWidget {
               ),
             ),
           ),
-          const SliverAppBar(
+          SliverAppBar(
+            centerTitle: true,
             surfaceTintColor: Colors.transparent,
             toolbarHeight: 0,
             snap: true,
@@ -88,22 +90,22 @@ class MainScreen extends StatelessWidget {
             pinned: true,
             floating: true,
             bottom: PreferredSize(
-                preferredSize: Size.fromHeight(290),
+                preferredSize: const Size.fromHeight(290),
                 child: Padding(
-                    padding: EdgeInsets.only(bottom: 0, left: 20, right: 20),
+                    padding: const EdgeInsets.only(bottom: 0, left: 20, right: 20),
                     child: Column(
                       children: [
-                        SizedBox(
+                        const SizedBox(
                           height: 25,
                         ),
-                        SearchTextFieldWidget(),
-                        SizedBox(height: 10,),
-                        FiltersWidget(),
-                        SizedBox(
+                        const SearchTextFieldWidget(),
+                        const SizedBox(height: 10,),
+                        _FiltersWidget(),
+                        const SizedBox(
                           height: 10,
                         ),
-                        MarketplaceSelectorWidget(),
-                        SizedBox(
+                        const MarketplaceSelectorWidget(),
+                        const SizedBox(
                           height: 10,
                         ),
                       ],
@@ -381,10 +383,16 @@ class MarketplaceSelectorWidget extends StatelessWidget {
   }
 }
 
-class FiltersWidget extends StatelessWidget {
-  const FiltersWidget({
-    super.key,
-  });
+
+class _FiltersWidget extends StatefulWidget {
+  _FiltersWidget({super.key});
+
+  @override
+  State<_FiltersWidget> createState() => _FiltersWidgetState();
+}
+
+class _FiltersWidgetState extends State<_FiltersWidget> {
+  int value = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -394,116 +402,63 @@ class FiltersWidget extends StatelessWidget {
       decoration: defaultDecoration,
       child: Column(
         children: [
-          Row(
-            children: [
-              Expanded(
-                child: BlocBuilder<MainScreenBloc, MainScreenState>(
-                  // buildWhen: (previous, current) =>
-                  //     current is BiggestSaleCategorySelected &&
-                  //     previous is! BiggestSaleCategorySelected,
-                  builder: (context, state) {
-                    return Container(
-                      decoration: state is BiggestSaleCategorySelected
-                          ? const BoxDecoration(
-                              borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(20),
-                              ),
-                              color: Color.fromRGBO(106, 96, 96, 0.9),
-                            )
-                          : null,
-                      child: TextButton(
-                          onPressed: () {
-                            bloc.add(const BiggestSaleCategoryButtonTapEvent());
-                          },
-                          style: const ButtonStyle(
-                            overlayColor: WidgetStatePropertyAll<Color>(
-                              Color.fromRGBO(106, 96, 96, 0.5),
-                            ),
-                            fixedSize: WidgetStatePropertyAll<Size>(
-                              Size.fromHeight(60),
-                            ),
-                            shape: WidgetStatePropertyAll(
-                              RoundedRectangleBorder(
-                                borderRadius: BorderRadius.only(
-                                    topLeft: Radius.circular(20)),
-                              ),
-                            ),
-                          ),
-                          child: const Text(
-                            'Найбільша вигода',
-                            style: defaultTextStyleOfSaleFilters,
-                            textAlign: TextAlign.center,
-                          )),
-                    );
-                  },
-                ),
+          Expanded(
+            child: AnimatedToggleSwitch<int>.size(
+              fittingMode: FittingMode.none,
+              textDirection: TextDirection.ltr,
+              // height: 121,
+              values: const [0,1],
+              indicatorSize: const Size(double.infinity,double.infinity),
+              current: value,
+              iconOpacity: 1,
+              borderWidth: 0,
+              selectedIconScale: 1,
+              style: const ToggleStyle(
+                borderColor:  Colors.transparent,
+                borderRadius: BorderRadius.only(topRight: Radius.circular(20),topLeft: Radius.circular(20)),
+                backgroundColor: Color.fromRGBO(217, 217, 217, 1),
+                indicatorColor: Color.fromRGBO(106, 96, 96, 1), 
               ),
-              Expanded(
-                child: BlocBuilder<MainScreenBloc, MainScreenState>(
-                  builder: (context, state) {
-                    return Container(
-                      decoration: state is SmallestPriceCategorySelected
-                          ? const BoxDecoration(
-                              borderRadius: BorderRadius.only(
-                                topRight: Radius.circular(20),
-                              ),
-                              color: Color.fromRGBO(106, 96, 96, 0.9),
-                            )
-                          : null,
-                      child: TextButton(
-                          onPressed: () {
-                            bloc.add(
-                                const SmallestPriceCategoryButtonTapEvent());
-                          },
-                          style: const ButtonStyle(
-                            overlayColor: WidgetStatePropertyAll<Color>(
-                              Color.fromRGBO(106, 96, 96, 0.5),
-                            ),
-                            fixedSize: WidgetStatePropertyAll<Size>(
-                              Size.fromHeight(60),
-                            ),
-                            shape: WidgetStatePropertyAll(
-                              RoundedRectangleBorder(
-                                borderRadius: BorderRadius.only(
-                                    topRight: Radius.circular(20)),
-                              ),
-                            ),
-                          ),
-                          child: const Text('Найдешевші',
-                              style: defaultTextStyleOfSaleFilters)),
-                    );
-                  },
-                ),
-              ),
-              // Expanded(
-              //     child: Container(
-              //   child: TextButton(
-              //       onPressed: () {
-              //         bloc.add(const LipsPriceCategoryButtonTapEvent());
-              //       },
-              //       style: buttonStyle,
-              //       child: const Text('Губи',
-              //           style: defaultTextStyleOfSaleFilters)),
-              // )),
-            ],
+              styleBuilder: (i) {
+                if(i == 0){
+                  return const ToggleStyle(
+                indicatorBorderRadius: BorderRadius.only(topLeft: Radius.circular(20)));
+                }
+                return const ToggleStyle(
+                indicatorBorderRadius: BorderRadius.only(topRight: Radius.circular(20)));
+              },
+              onChanged: (i) {
+                value = i;
+                if (i == 0) {
+                  bloc.add(const BiggestSaleCategoryButtonTapEvent());
+                } else {
+                  bloc.add(const SmallestPriceCategoryButtonTapEvent());
+                }
+                setState(() {});
+              },
+              iconBuilder: (i) {
+                if( i == 0){
+                  return const Text('Найбільша вигода',style: defaultTextStyleOfSaleFilters,textAlign: TextAlign.center);
+                }
+                return const Text('Найдешевші',style: defaultTextStyleOfSaleFilters,textAlign: TextAlign.center,);
+              },
+            
+            ),
           ),
           const Divider(
-            height: 1,
-            color: Colors.black,
-          ),
-          // const SizedBox(
-          //   height: 5,
-          // ),
+              height: 1,
+              color: Colors.black,
+            ),
           TextButton(
-              onPressed: () {
-                bloc.add(const FilterButtonTapEvent());
-              },
-              style: bigFilterButtonStyle,
-              child: const Text(
-                'Фільтр',
-                style: TextStyle(
-                    color: Colors.black, letterSpacing: 25, fontSize: 22),
-              ))
+                onPressed: () {
+                  bloc.add(const FilterButtonTapEvent());
+                },
+                style: bigFilterButtonStyle,
+                child: const Text(
+                  'Фільтр',
+                  style: TextStyle(
+                      color: Colors.black, letterSpacing: 25, fontSize: 22),
+                ))
         ],
       ),
     );
