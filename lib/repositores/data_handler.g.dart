@@ -19,6 +19,7 @@ Brand _$BrandFromJson(Map<String, dynamic> json) => Brand(
       (json['products'] as List<dynamic>)
           .map((e) => ProductCard.fromJson(e as Map<String, dynamic>))
           .toList(),
+      false,
     );
 
 ProductCard _$ProductCardFromJson(Map<String, dynamic> json) => ProductCard(

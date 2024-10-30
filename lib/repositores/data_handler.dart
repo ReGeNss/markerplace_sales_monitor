@@ -37,12 +37,13 @@ class MarketplacesData{
 
 @JsonSerializable(createToJson: false)
 class Brand{
+  bool isSelected; 
   final String name;
   final List<ProductCard> products;
 
   factory Brand.fromJson(Map<String, dynamic> json) => _$BrandFromJson(json);
 
-  Brand(this.name, this.products); 
+  Brand(this.name, this.products,this.isSelected); 
 }
 
 @JsonSerializable(createToJson: false)

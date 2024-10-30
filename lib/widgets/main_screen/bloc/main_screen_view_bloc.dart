@@ -6,6 +6,7 @@ import 'package:markerplace_sales_monitor/widgets/main_screen/bloc/bloc_state.da
 class MainScreenBloc extends Bloc<MainScreenEvents, MainScreenState>{
   static final DataHandler _dataHandler = DataHandler();
   late final MarketplacesData marketplacesData;
+  final List<Brand> brands = []; 
   final _productList = <ProductCard>[]; 
   String _searchQuery = ''; 
 
@@ -34,36 +35,68 @@ class MainScreenBloc extends Bloc<MainScreenEvents, MainScreenState>{
       marketsList.add(element);
     });
   }
+  
+  void createBrandsList(){
+    brands.addAll(marketplacesData.brands);
+  }
 
   void _addDataToProductList(List<ProductCard> products){
     _productList.clear(); 
     _productList.addAll(products);
   }
 
-  void _createAllMarketsProductsList(){ 
+  void _createAllMarketsProductsList(bool isSelectedBrandsExist){ 
     List<ProductCard> products = [];
     final brands = marketplacesData.brands;
-    
+    if(isSelectedBrandsExist){
+      for(var brand in brands){
+        if(brand.isSelected){
+          for(var product in brand.products){
+            products.add(product);
+          }
+        }
+      }
+    }
+    else{
     for(var e in brands){
       for(var product in e.products){
         products.add(product);
       }
-    }
+    }}
     _addDataToProductList(products);
   }
 
   List<ProductCard> _selectMarketplace(int? index){
-    if( index == null) {_createAllMarketsProductsList(); return _productList;}
+    bool selectedBrandsExist = false; 
+    for(var brand in brands){
+      if(brand.isSelected){
+        selectedBrandsExist = true; 
+        break;
+      }
+    }
+    if( index == null) {_createAllMarketsProductsList(selectedBrandsExist); return _productList;}
     selectedMarketplace = index;
     final selectedMarketplaceName = marketsList[index];
     final selectedMarketplaceData = <ProductCard>[]; 
+    if(selectedBrandsExist){
+      for(var brand in brands){
+        if(brand.isSelected){
+          for(var product in brand.products){
+            if(product.marketplace == selectedMarketplaceName){
+              selectedMarketplaceData.add(product);
+            }
+          }
+        }
+      }
+    }
+    else{
     for(var e in marketplacesData.brands){
       for(var product in e.products){
         if(product.marketplace == selectedMarketplaceName){
           selectedMarketplaceData.add(product);
         }
       }
-    }
+    }}
     // final selectedMarketplaceData = marketplaceList.firstWhere((element) => element.marketplace == selectedMarketplaceName); 
     return selectedMarketplaceData; 
   }
@@ -84,28 +117,16 @@ class MainScreenBloc extends Bloc<MainScreenEvents, MainScreenState>{
   }
 
   List<ProductCard> _smallestPriceFilter(List<ProductCard> productList) {
-  final newList = productList.toSet().toList();
-  newList.sort((a, b) => a.getCurrentPriceAsDouble().compareTo(b.getCurrentPriceAsDouble()));
-  return newList;
-}
+    final newList = productList.toSet().toList();
+    newList.sort((a, b) => a.getCurrentPriceAsDouble().compareTo(b.getCurrentPriceAsDouble()));
+    return newList; 
+  }
 
   get countOfCategories => marketsList.length;
   get countOfProducts => _productList.length;
 
-  String? getCurrentMarketplace(String title) {
-    if (selectedMarketplace != null) {
-      return null;}
-    // } else {
-    //   for (var element in marketplaceList) {
-    //     final marketplace = element.marketplace;
-    //     for (var e in element.products) {
-    //       if (e.title == title) {
-    //         return marketplace;
-    //       }
-    //     }
-    //   }
-    // }
-    return null;
+  List<Brand> getBrands(){
+    return brands.toList();
   }
 
   void _searchTextFieldChangedEvent(SearchTextFieldChangedEvent event, Emitter<MainScreenState> emit){
@@ -132,7 +153,8 @@ class MainScreenBloc extends Bloc<MainScreenEvents, MainScreenState>{
 
   void _onAllCategoryButtonTapEvent(AllCategoryButtonTapEvent event, Emitter<MainScreenState> emit){ 
     selectedMarketplace = null;
-    _createAllMarketsProductsList();
+    final isSelectedBrandsExist = brands.any((element) => element.isSelected);
+    _createAllMarketsProductsList(isSelectedBrandsExist);
     rebuildProductList(state); 
     emit(state.copyWith());
   }
@@ -160,12 +182,15 @@ class MainScreenBloc extends Bloc<MainScreenEvents, MainScreenState>{
   }
 
   void _filterButtonTapEvent(FilterButtonTapEvent event, Emitter<MainScreenState> emit){
-    // emit(state);
+    rebuildProductList(state);
+
+    emit(state.copyWith());
   }
 
   void _loadingDataCompletedEvent(LoadingDataCompletedEvent event, Emitter<MainScreenState> emit){
     marketplacesData = event.data;
     createMarketsList();
+    createBrandsList();
     // _createAllMarketsProductsList(); 
     add(const BiggestSaleCategoryButtonTapEvent());
     // emit(BiggestSaleCategorySelected());
