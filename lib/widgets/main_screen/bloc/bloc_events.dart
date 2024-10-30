@@ -39,7 +39,7 @@ class SearchTextFieldChangedEvent extends MainScreenEvents{
 }
 
 class LoadingDataCompletedEvent extends MainScreenEvents{ 
-  final List<MarketplaceData> data; 
+  final MarketplacesData data; 
   const LoadingDataCompletedEvent(this.data); 
 }
 

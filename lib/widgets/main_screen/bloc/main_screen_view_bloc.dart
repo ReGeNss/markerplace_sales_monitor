@@ -5,7 +5,7 @@ import 'package:markerplace_sales_monitor/widgets/main_screen/bloc/bloc_state.da
 
 class MainScreenBloc extends Bloc<MainScreenEvents, MainScreenState>{
   static final DataHandler _dataHandler = DataHandler();
-  late final List<MarketplaceData> marketplaceList;
+  late final MarketplacesData marketplacesData;
   final _productList = <ProductCard>[]; 
   String _searchQuery = ''; 
 
@@ -30,10 +30,9 @@ class MainScreenBloc extends Bloc<MainScreenEvents, MainScreenState>{
   }
 
   void createMarketsList(){
-    marketplaceList.forEach((e){
-      final name = e.marketplace; 
-      marketsList.add(name);
-    }); 
+    marketplacesData.marketplaces.forEach((element) {
+      marketsList.add(element);
+    });
   }
 
   void _addDataToProductList(List<ProductCard> products){
@@ -43,7 +42,9 @@ class MainScreenBloc extends Bloc<MainScreenEvents, MainScreenState>{
 
   void _createAllMarketsProductsList(){ 
     List<ProductCard> products = [];
-    for(var e in marketplaceList){
+    final brands = marketplacesData.brands;
+    
+    for(var e in brands){
       for(var product in e.products){
         products.add(product);
       }
@@ -55,8 +56,16 @@ class MainScreenBloc extends Bloc<MainScreenEvents, MainScreenState>{
     if( index == null) {_createAllMarketsProductsList(); return _productList;}
     selectedMarketplace = index;
     final selectedMarketplaceName = marketsList[index];
-    final selectedMarketplaceData = marketplaceList.firstWhere((element) => element.marketplace == selectedMarketplaceName); 
-    return selectedMarketplaceData.products; 
+    final selectedMarketplaceData = <ProductCard>[]; 
+    for(var e in marketplacesData.brands){
+      for(var product in e.products){
+        if(product.marketplace == selectedMarketplaceName){
+          selectedMarketplaceData.add(product);
+        }
+      }
+    }
+    // final selectedMarketplaceData = marketplaceList.firstWhere((element) => element.marketplace == selectedMarketplaceName); 
+    return selectedMarketplaceData; 
   }
 
   void rebuildProductList(MainScreenState newState){
@@ -85,17 +94,17 @@ class MainScreenBloc extends Bloc<MainScreenEvents, MainScreenState>{
 
   String? getCurrentMarketplace(String title) {
     if (selectedMarketplace != null) {
-      return null;
-    } else {
-      for (var element in marketplaceList) {
-        final marketplace = element.marketplace;
-        for (var e in element.products) {
-          if (e.title == title) {
-            return marketplace;
-          }
-        }
-      }
-    }
+      return null;}
+    // } else {
+    //   for (var element in marketplaceList) {
+    //     final marketplace = element.marketplace;
+    //     for (var e in element.products) {
+    //       if (e.title == title) {
+    //         return marketplace;
+    //       }
+    //     }
+    //   }
+    // }
     return null;
   }
 
@@ -155,7 +164,7 @@ class MainScreenBloc extends Bloc<MainScreenEvents, MainScreenState>{
   }
 
   void _loadingDataCompletedEvent(LoadingDataCompletedEvent event, Emitter<MainScreenState> emit){
-    marketplaceList = event.data;
+    marketplacesData = event.data;
     createMarketsList();
     // _createAllMarketsProductsList(); 
     add(const BiggestSaleCategoryButtonTapEvent());
