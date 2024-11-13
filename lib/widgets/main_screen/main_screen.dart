@@ -20,6 +20,8 @@ const TextStyle defaultTextStyleOfSaleFilters =
 const TextStyle productCardTextStyle =
     TextStyle(color: Colors.white, fontSize: 15);
 const Color defaultColor = Color.fromRGBO(217, 217, 217, 1);
+const Color brown = Color.fromRGBO(106, 96, 96, 1); 
+const Color lightBrown = Color.fromRGBO(106, 96, 96, 0.5);
 BoxDecoration defaultDecoration = BoxDecoration(
   borderRadius: BorderRadius.circular(20),
   color: defaultColor,
@@ -40,9 +42,29 @@ ButtonStyle buttonStyle = ButtonStyle(
 
 
 
-ButtonStyle bigFilterButtonStyle = const ButtonStyle(
-  overlayColor:  WidgetStatePropertyAll<Color>(
-    Color.fromRGBO(106, 96, 96, 0.5),
+ButtonStyle bigFilterButtonDisableStyle = const ButtonStyle(
+  overlayColor: WidgetStatePropertyAll<Color>(
+    Color.fromRGBO(217, 217, 217, 1),
+  ),
+  fixedSize:  WidgetStatePropertyAll<Size>(
+    Size(2000,60),
+  ),
+  shape: WidgetStatePropertyAll(
+    RoundedRectangleBorder(
+      borderRadius: BorderRadius.only(
+        bottomLeft: Radius.circular(20),
+        bottomRight: Radius.circular(20),
+      ),
+    ),
+  ),
+);
+
+ButtonStyle bigFilterButtonActiveStyle = const ButtonStyle(
+  overlayColor: WidgetStatePropertyAll<Color>(
+    brown,
+  ),
+  backgroundColor: WidgetStatePropertyAll<Color>(
+    brown,
   ),
   fixedSize:  WidgetStatePropertyAll<Size>(
     Size(2000,60),
@@ -396,7 +418,8 @@ class _FiltersWidgetState extends State<_FiltersWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final bloc = BlocProvider.of<MainScreenBloc>(context);
+    // final bloc = BlocProvider.of<MainScreenBloc>(context);
+    final bloc = context.watch<MainScreenBloc>();
     return Container(
       height: 121,
       decoration: defaultDecoration,
@@ -457,17 +480,24 @@ class _FiltersWidgetState extends State<_FiltersWidget> {
                       return filtersDialogWidget(mainScreenContext: mainScreenContext);
                     });
                   },
-                  style: bigFilterButtonStyle,
+                  style: filterButtonStyleSelector(bloc.isBrandFilersActive),
                   child: const Text(
-                    'Фільтр',
+                    'Фільтр брендів',
                     style: TextStyle(
-                        color: Colors.black, letterSpacing: 25, fontSize: 22),
+                        color: Colors.black, letterSpacing: 10, fontSize: 22),
                   )),
           
         ],
       ),
     );
   }
+}
+
+ButtonStyle filterButtonStyleSelector(bool isActive){
+  if(isActive){
+    return bigFilterButtonActiveStyle;
+  }
+  return bigFilterButtonDisableStyle;
 }
 
 class filtersDialogWidget extends StatelessWidget {
@@ -482,6 +512,7 @@ class filtersDialogWidget extends StatelessWidget {
     final brands = BlocProvider.of<MainScreenBloc>(mainScreenContext).getBrands();
     return Dialog(
       child: Container(
+        margin: const EdgeInsets.all(10),
         height: 400,
         width: 200,
         child: Center(child: 
@@ -491,7 +522,7 @@ class filtersDialogWidget extends StatelessWidget {
               return DialogBrandListTitleWidget(brands: brands,index:index,mainScreenContext: mainScreenContext,);
             },
             separatorBuilder: (context, index) {
-              return const Divider(color: defaultColor,);
+              return const SizedBox(height: 10);
             },  
           ),
         ),
@@ -517,6 +548,12 @@ class DialogBrandListTitleWidget extends StatelessWidget {
     return StatefulBuilder(
       builder: (context,state) {
         return ListTile(
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(20))
+          ),
+          tileColor: lightBrown,
+          selectedTileColor: brown,
+          selected: brands[index].isSelected,
           title: Text(brands[index].name, style: defaultTextStyleOfSaleFilters,),
           trailing: Checkbox(
             value: brands[index].isSelected, 
@@ -528,9 +565,10 @@ class DialogBrandListTitleWidget extends StatelessWidget {
               },);
             },
             ),
-          onTap: () => (){brands[index].isSelected = !brands[index].isSelected;mainScreenContext.read<MainScreenBloc>().add(const FilterButtonTapEvent());state(() {
-            
-          },);},
+          onTap: () => (){
+            brands[index].isSelected = !brands[index].isSelected;
+            mainScreenContext.read<MainScreenBloc>().add(const FilterButtonTapEvent());
+            state(() {},);},
         );
       }
     );

@@ -7,6 +7,7 @@ class MainScreenBloc extends Bloc<MainScreenEvents, MainScreenState>{
   static final DataHandler _dataHandler = DataHandler();
   late final MarketplacesData marketplacesData;
   final List<Brand> brands = []; 
+  bool isBrandFilersActive = false;
   final _productList = <ProductCard>[]; 
   String _searchQuery = ''; 
 
@@ -183,7 +184,11 @@ class MainScreenBloc extends Bloc<MainScreenEvents, MainScreenState>{
 
   void _filterButtonTapEvent(FilterButtonTapEvent event, Emitter<MainScreenState> emit){
     rebuildProductList(state);
-
+    if(brands.any((element) => element.isSelected)){
+      isBrandFilersActive = true;
+    }else {
+      isBrandFilersActive = false;
+    }
     emit(state.copyWith());
   }
 
