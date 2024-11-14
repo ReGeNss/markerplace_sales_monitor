@@ -1,24 +1,18 @@
 import 'dart:convert';
-import 'dart:io';
-import 'package:markerplace_sales_monitor/temporary_json.dart';
-import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:markerplace_sales_monitor/repositores/internet_connection_handler.dart';
 part 'data_handler.g.dart';
 
 class DataHandler {
   static const String _url = 'container-function.grayplant-56db7559.westeurope.azurecontainerapps.io';
-  static const String _unencodetPath = '/api/httpGetMarketplaces';
+  static const String _unencodetPath = '/api/httpGetScrapedData';
   static final InternetConnectionHandler _internetConnectionHandler = InternetConnectionHandler(); 
 
-  //TODO: дочекатися реалізації відповіді від сервера
-
   Future<MarketplacesData> getSalesData() async{ 
-    // final dataInString = await _internetConnectionHandler.getData(_url, _unencodetPath);
-    // final dataInString = File('C:\\Users\\regen\\OneDrive\\Desktop\\dev\\flutter dev\\markerplace_sales_monitor\\lib\\temporary.json').readAsStringSync();
-    final dataInString = json; 
-    final dataJson = jsonDecode(dataInString);
-    final data = MarketplacesData.fromJson(dataJson);
+    final dataInString = await _internetConnectionHandler.getData(_url, _unencodetPath);
+    final dataJson = jsonDecode(utf8.decode(dataInString.codeUnits));
+    print(dataJson.length);
+    final data = MarketplacesData.fromJson(dataJson[0]);
     return data;
   }
 
