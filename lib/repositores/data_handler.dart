@@ -5,16 +5,14 @@ part 'data_handler.g.dart';
 
 class DataHandler {
   static const String _url = 'container-function.grayplant-56db7559.westeurope.azurecontainerapps.io';
-  static const String _unencodetPath = '/api/httpGetMarketplaces';
+  static const String _unencodetPath = '/api/httpGetScrapedData';
   static final InternetConnectionHandler _internetConnectionHandler = InternetConnectionHandler(); 
 
-  Future<List<MarketplaceData>> getSalesData() async{ 
+  Future<MarketplacesData> getSalesData() async{ 
     final dataInString = await _internetConnectionHandler.getData(_url, _unencodetPath);
-    final dataJson = jsonDecode(dataInString);
-    final data = <MarketplaceData>[]; 
-    for(var e in dataJson){
-      data.add(MarketplaceData.fromJson(e));
-    }
+    final dataJson = jsonDecode(utf8.decode(dataInString.codeUnits));
+    print(dataJson.length);
+    final data = MarketplacesData.fromJson(dataJson[0]);
     return data;
   }
 
@@ -22,13 +20,24 @@ class DataHandler {
 
 
 @JsonSerializable(createToJson: false)
-class MarketplaceData{
-  final String marketplace;
+class MarketplacesData{
+  final List<String> marketplaces;
+  final List<Brand> brands;
+
+  factory MarketplacesData.fromJson(Map<String, dynamic> json) => _$MarketplacesDataFromJson(json);
+
+  MarketplacesData(this.marketplaces, this.brands); 
+}
+
+@JsonSerializable(createToJson: false)
+class Brand{
+  bool isSelected; 
+  final String name;
   final List<ProductCard> products;
 
-  factory MarketplaceData.fromJson(Map<String, dynamic> json) => _$MarketplaceDataFromJson(json);
+  factory Brand.fromJson(Map<String, dynamic> json) => _$BrandFromJson(json);
 
-  MarketplaceData(this.marketplace, this.products); 
+  Brand(this.name, this.products,this.isSelected); 
 }
 
 @JsonSerializable(createToJson: false)
@@ -37,6 +46,8 @@ class ProductCard{
   final String currentPrice;
   final String? oldPrice; 
   final String imgSrc;
+  final String? volume; 
+  final String marketplace; 
   late final int? percentOfSale;
 
   factory ProductCard.fromJson(Map<String, dynamic> json) => _$ProductCardFromJson(json);
@@ -56,7 +67,7 @@ class ProductCard{
     return parsedPrice;
   }
 
-  ProductCard(this.title, this.currentPrice, this.oldPrice, this.imgSrc){
+  ProductCard(this.title, this.currentPrice, this.oldPrice, this.imgSrc, this.volume, this.marketplace){
     if(oldPrice == null || oldPrice!.isEmpty || oldPrice == 'null') {percentOfSale = null; return; } // TODO: FIX IN FUTURE
     final current= getCurrentPriceAsDouble();
     final old = getOldPriceAsDouble();

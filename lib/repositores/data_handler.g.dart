@@ -6,12 +6,20 @@ part of 'data_handler.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-MarketplaceData _$MarketplaceDataFromJson(Map<String, dynamic> json) =>
-    MarketplaceData(
-      json['marketplace'] as String,
+MarketplacesData _$MarketplacesDataFromJson(Map<String, dynamic> json) =>
+    MarketplacesData(
+      (json['marketplaces'] as List<dynamic>).map((e) => e as String).toList(),
+      (json['brands'] as List<dynamic>)
+          .map((e) => Brand.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+
+Brand _$BrandFromJson(Map<String, dynamic> json) => Brand(
+      json['name'] as String,
       (json['products'] as List<dynamic>)
           .map((e) => ProductCard.fromJson(e as Map<String, dynamic>))
           .toList(),
+      false,
     );
 
 ProductCard _$ProductCardFromJson(Map<String, dynamic> json) => ProductCard(
@@ -19,4 +27,6 @@ ProductCard _$ProductCardFromJson(Map<String, dynamic> json) => ProductCard(
       json['currentPrice'] as String,
       json['oldPrice'] as String?,
       json['imgSrc'] as String,
+      json['volume'] as String?,
+      json['marketplace'] as String,
     );
