@@ -3,25 +3,11 @@ import 'package:markerplace_sales_monitor/repositores/data_handler.dart';
 import 'package:markerplace_sales_monitor/widgets/main_screen/bloc/bloc_events.dart';
 import 'package:markerplace_sales_monitor/widgets/main_screen/bloc/bloc_state.dart';
 
-class MainScreenBloc extends Bloc<MainScreenEvents, MainScreenState>{
-  static final DataHandler _dataHandler = DataHandler();
-  late final MarketplacesData marketplacesData;
-  final List<Brand> brands = []; 
-  bool isBrandFilersActive = false;
-  final _productList = <ProductCard>[]; 
-  String _searchQuery = ''; 
-
-  get productList  {
-    return _productList;
-  } 
-
-  final List<String> marketsList = []; 
-  int? selectedMarketplace; // null means all marketplaces
-
+class MainScreenBloc extends Bloc<MainScreenEvents, MainScreenState>{ // null means all marketplaces
   MainScreenBloc() : super(LoadingData()){
     _dataHandler.getSalesData().then((value) => {
-      add(LoadingDataCompletedEvent(value))
-    });
+      add(LoadingDataCompletedEvent(value)),
+    },);
     on<AllCategoryButtonTapEvent>(_onAllCategoryButtonTapEvent);
     on<MarketplaceSelectButtonTapEvent>(_marketplaceSelectButtonTapEvent);  
     on<BiggestSaleCategoryButtonTapEvent>(_biggestSaleCategoryButtonTapEvent);
@@ -31,10 +17,22 @@ class MainScreenBloc extends Bloc<MainScreenEvents, MainScreenState>{
     on<LoadingDataCompletedEvent>(_loadingDataCompletedEvent);
   }
 
+  static final DataHandler _dataHandler = DataHandler();
+  late final MarketplacesData marketplacesData;
+  final List<Brand> brands = []; 
+  bool isBrandFilersActive = false;
+  final _productList = <ProductCard>[]; 
+  String _searchQuery = ''; 
+
+  List<ProductCard> get productList  {
+    return _productList;
+  } 
+
+  final List<String> marketsList = []; 
+  int? selectedMarketplace;
+
   void createMarketsList(){
-    marketplacesData.marketplaces.forEach((element) {
-      marketsList.add(element);
-    });
+    marketplacesData.marketplaces.forEach((element) => marketsList.add(element));
   }
   
   void createBrandsList(){
@@ -47,42 +45,41 @@ class MainScreenBloc extends Bloc<MainScreenEvents, MainScreenState>{
   }
 
   void _createAllMarketsProductsList(bool isSelectedBrandsExist){ 
-    List<ProductCard> products = [];
+    final List<ProductCard> products = [];
     final brands = marketplacesData.brands;
     if(isSelectedBrandsExist){
-      for(var brand in brands){
+      for(final brand in brands){
         if(brand.isSelected){
-          for(var product in brand.products){
-            products.add(product);
-          }
+          brand.products.forEach((product) => products.add(product));
         }
       }
     }
     else{
-    for(var e in brands){
-      for(var product in e.products){
-        products.add(product);
-      }
+    for(final brand in brands){
+      brand.products.forEach((product) {products.add(product);});
     }}
     _addDataToProductList(products);
   }
 
   List<ProductCard> _selectMarketplace(int? index){
     bool selectedBrandsExist = false; 
-    for(var brand in brands){
+    for(final brand in brands){
       if(brand.isSelected){
         selectedBrandsExist = true; 
         break;
       }
     }
-    if( index == null) {_createAllMarketsProductsList(selectedBrandsExist); return _productList;}
+    if( index == null) {
+      _createAllMarketsProductsList(selectedBrandsExist); 
+      return _productList;
+    }
     selectedMarketplace = index;
     final selectedMarketplaceName = marketsList[index];
     final selectedMarketplaceData = <ProductCard>[]; 
     if(selectedBrandsExist){
-      for(var brand in brands){
+      for(final brand in brands){
         if(brand.isSelected){
-          for(var product in brand.products){
+          for(final product in brand.products){
             if(product.marketplace == selectedMarketplaceName){
               selectedMarketplaceData.add(product);
             }
@@ -91,14 +88,13 @@ class MainScreenBloc extends Bloc<MainScreenEvents, MainScreenState>{
       }
     }
     else{
-    for(var e in marketplacesData.brands){
-      for(var product in e.products){
+    for(final e in marketplacesData.brands){
+      for(final product in e.products){
         if(product.marketplace == selectedMarketplaceName){
           selectedMarketplaceData.add(product);
         }
       }
     }}
-    // final selectedMarketplaceData = marketplaceList.firstWhere((element) => element.marketplace == selectedMarketplaceName); 
     return selectedMarketplaceData; 
   }
 
@@ -123,8 +119,8 @@ class MainScreenBloc extends Bloc<MainScreenEvents, MainScreenState>{
     return newList; 
   }
 
-  get countOfCategories => marketsList.length;
-  get countOfProducts => _productList.length;
+  int get countOfCategories => marketsList.length;
+  int get countOfProducts => _productList.length;
 
   List<Brand> getBrands(){
     return brands.toList();
@@ -148,7 +144,7 @@ class MainScreenBloc extends Bloc<MainScreenEvents, MainScreenState>{
       return;
     } 
     final searchQuery = _searchQuery.toLowerCase(); 
-    final filteredList = productList.where((element) => (element.title.toLowerCase()).contains(searchQuery)).toList();
+    final filteredList = productList.where((element) => element.title.toLowerCase().contains(searchQuery)).toList();
     _addDataToProductList(filteredList);
   }
 

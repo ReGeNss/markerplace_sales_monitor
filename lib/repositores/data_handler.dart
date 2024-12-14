@@ -11,7 +11,6 @@ class DataHandler {
   Future<MarketplacesData> getSalesData() async{ 
     final dataInString = await _internetConnectionHandler.getData(_url, _unencodetPath);
     final dataJson = jsonDecode(utf8.decode(dataInString.codeUnits));
-    print(dataJson.length);
     final data = MarketplacesData.fromJson(dataJson[0]);
     return data;
   }
@@ -21,27 +20,40 @@ class DataHandler {
 
 @JsonSerializable(createToJson: false)
 class MarketplacesData{
-  final List<String> marketplaces;
-  final List<Brand> brands;
+  MarketplacesData(this.marketplaces, this.brands);
 
   factory MarketplacesData.fromJson(Map<String, dynamic> json) => _$MarketplacesDataFromJson(json);
-
-  MarketplacesData(this.marketplaces, this.brands); 
+  
+  final List<String> marketplaces;
+  final List<Brand> brands; 
 }
 
 @JsonSerializable(createToJson: false)
 class Brand{
-  bool isSelected; 
-  final String name;
-  final List<ProductCard> products;
+  Brand(this.name, this.products,this.isSelected);
 
   factory Brand.fromJson(Map<String, dynamic> json) => _$BrandFromJson(json);
 
-  Brand(this.name, this.products,this.isSelected); 
+  bool isSelected; 
+  final String name;
+  final List<ProductCard> products; 
 }
 
 @JsonSerializable(createToJson: false)
 class ProductCard{
+  ProductCard(this.title, this.currentPrice, this.oldPrice, this.imgSrc, this.volume, this.marketplace){
+    if(oldPrice == null || oldPrice!.isEmpty || oldPrice == 'null') {
+      percentOfSale = null;
+       return; 
+    } // TODO: FIX IN FUTURE
+    final current= getCurrentPriceAsDouble();
+    final old = getOldPriceAsDouble();
+    final percent = 100 - ((current / old) * 100);
+    percentOfSale = percent.toInt();
+  }
+
+  factory ProductCard.fromJson(Map<String, dynamic> json) => _$ProductCardFromJson(json);
+  
   final String title; 
   final String currentPrice;
   final String? oldPrice; 
@@ -50,29 +62,19 @@ class ProductCard{
   final String marketplace; 
   late final int? percentOfSale;
 
-  factory ProductCard.fromJson(Map<String, dynamic> json) => _$ProductCardFromJson(json);
-
 
   double getCurrentPriceAsDouble(){
     final price = currentPrice.split(' ')[0].replaceAll(',', '.');
     return double.parse(price);
   }
+
   double getOldPriceAsDouble(){
-    // print('$this ${oldPrice == null}' ); 
     if(oldPrice == null ){
       throw Error();
     }
     final price = oldPrice!.split(' ')[0].replaceAll(',', '.');
     final parsedPrice = double.parse(price);
     return parsedPrice;
-  }
-
-  ProductCard(this.title, this.currentPrice, this.oldPrice, this.imgSrc, this.volume, this.marketplace){
-    if(oldPrice == null || oldPrice!.isEmpty || oldPrice == 'null') {percentOfSale = null; return; } // TODO: FIX IN FUTURE
-    final current= getCurrentPriceAsDouble();
-    final old = getOldPriceAsDouble();
-    final percent = 100 - ((current / old) * 100);
-    percentOfSale = percent.toInt();
   } 
 
   @override 

@@ -4,9 +4,9 @@ abstract class MainScreenEvents{
   const MainScreenEvents(); 
 } 
 
-class MarketplaceSelectButtonTapEvent extends MainScreenEvents{ 
-  final int marketplaceId;
+class MarketplaceSelectButtonTapEvent extends MainScreenEvents{
   const MarketplaceSelectButtonTapEvent(this.marketplaceId); 
+  final int marketplaceId; 
 }
 class AllCategoryButtonTapEvent extends MainScreenEvents{ 
 
@@ -34,12 +34,11 @@ class FilterButtonTapEvent extends MainScreenEvents{
 }
 
 class SearchTextFieldChangedEvent extends MainScreenEvents{ 
-  final String text; 
   const SearchTextFieldChangedEvent(this.text); 
+  final String text; 
 }
 
 class LoadingDataCompletedEvent extends MainScreenEvents{ 
-  final MarketplacesData data; 
   const LoadingDataCompletedEvent(this.data); 
+  final MarketplacesData data; 
 }
-
