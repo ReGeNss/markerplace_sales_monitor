@@ -1,4 +1,4 @@
-import 'package:markerplace_sales_monitor/repositores/data_handler.dart';
+import 'package:markerplace_sales_monitor/repositores/data_service.dart';
 
 abstract class MainScreenEvents{ 
   const MainScreenEvents(); 
@@ -6,6 +6,7 @@ abstract class MainScreenEvents{
 
 class MarketplaceSelectButtonTapEvent extends MainScreenEvents{
   const MarketplaceSelectButtonTapEvent(this.marketplaceId); 
+
   final int marketplaceId; 
 }
 class AllCategoryButtonTapEvent extends MainScreenEvents{ 
@@ -34,11 +35,13 @@ class FilterButtonTapEvent extends MainScreenEvents{
 }
 
 class SearchTextFieldChangedEvent extends MainScreenEvents{ 
-  const SearchTextFieldChangedEvent(this.text); 
+  const SearchTextFieldChangedEvent(this.text);
+
   final String text; 
 }
 
 class LoadingDataCompletedEvent extends MainScreenEvents{ 
   const LoadingDataCompletedEvent(this.data); 
+  
   final MarketplacesData data; 
 }

@@ -2,10 +2,11 @@ abstract class MainScreenState{
   MainScreenState copyWith(); 
 }
 
-class LoadingData extends MainScreenState {
+class InDataLoad extends MainScreenState {
+
   @override
-  LoadingData copyWith() {
-    return LoadingData();
+  InDataLoad copyWith() {
+    return InDataLoad();
   }
 }
 
@@ -19,16 +20,8 @@ class BiggestSaleCategorySelected extends MainScreenState {
 
 class SmallestPriceCategorySelected extends MainScreenState {
 
-  SmallestPriceCategorySelected();
   @override
   SmallestPriceCategorySelected copyWith() {
     return SmallestPriceCategorySelected();
   }
 }
-
-class LipsPriceCategorySelected extends MainScreenState {
-
-  @override
-  LipsPriceCategorySelected copyWith() {
-    return LipsPriceCategorySelected();
-  }}

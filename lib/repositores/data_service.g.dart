@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'data_handler.dart';
+part of 'data_service.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
@@ -24,8 +24,10 @@ Brand _$BrandFromJson(Map<String, dynamic> json) => Brand(
 
 ProductCard _$ProductCardFromJson(Map<String, dynamic> json) => ProductCard(
       json['title'] as String,
-      json['currentPrice'] as String,
-      json['oldPrice'] as String?,
+      double.parse(json['currentPrice'].split(' ')[0].replaceAll(',', '.')),
+      json['oldPrice'] == null
+          ? null
+          : double.parse(json['oldPrice'].split(' ')[0].replaceAll(',', '.')),
       json['imgSrc'] as String,
       json['volume'] as String?,
       json['marketplace'] as String,
