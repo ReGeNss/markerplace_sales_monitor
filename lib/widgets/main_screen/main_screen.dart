@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -96,14 +95,14 @@ class MainScreen extends StatelessWidget {
               height: 200,
               child: const Center(
                 child: Text(
-                  'Найбільш губні знижки саме тут!',
+                  'Всі знижки саме тут!',
                   style: TextStyle(fontSize: 30),
                   textAlign: TextAlign.center,
                 ),
               ),
             ),
           ),
-          SliverAppBar(
+          const SliverAppBar(
             centerTitle: true,
             surfaceTintColor: Colors.transparent,
             toolbarHeight: 0,
@@ -112,32 +111,32 @@ class MainScreen extends StatelessWidget {
             pinned: true,
             floating: true,
             bottom: PreferredSize(
-                preferredSize: const Size.fromHeight(290),
+                preferredSize: Size.fromHeight(290),
                 child: Padding(
-                    padding: const EdgeInsets.only(bottom: 0, left: 20, right: 20),
+                    padding: EdgeInsets.only(left: 20, right: 20),
                     child: Column(
                       children: [
-                        const SizedBox(
+                        SizedBox(
                           height: 25,
                         ),
-                        const SearchTextFieldWidget(),
-                        const SizedBox(height: 10,),
+                        SearchTextFieldWidget(),
+                        SizedBox(height: 10,),
                         _FiltersWidget(),
-                        const SizedBox(
+                        SizedBox(
                           height: 10,
                         ),
-                        const MarketplaceSelectorWidget(),
-                        const SizedBox(
+                        MarketplaceSelectorWidget(),
+                        SizedBox(
                           height: 10,
                         ),
                       ],
-                    ))),
+                    ),),),
           ),
           const SliverPadding(
             padding: EdgeInsets.symmetric(horizontal: 20),
             sliver: SliverListOfProductsWidget(),
-          )
-        ]),
+          ),
+        ],),
       ),
     );
   }
@@ -177,7 +176,9 @@ class SearchTextFieldWidget extends StatelessWidget {
       ),
       onChanged: (value) {
         if(timer !=null){
-          if(timer!.isActive) {timer!.cancel();}
+          if(timer!.isActive) {
+            timer!.cancel();
+          }
         }
         timer = Timer(const Duration(milliseconds: 400), () => bloc.add(SearchTextFieldChangedEvent(value))); 
       },
@@ -198,11 +199,9 @@ class SliverListOfProductsWidget extends StatelessWidget {
     final bloc = BlocProvider.of<MainScreenBloc>(context);
     return BlocBuilder<MainScreenBloc, MainScreenState>(
       builder: (context, state) {
-        // print('rebuilding list of products');
         if (state is LoadingData) {
           return const SliverToBoxAdapter(
-            // child: SizedBox(height: 100, width: 100,child: CircularProgressIndicator()),
-            child: Center(child: Text('Накачування ваших губ ботоксом...', style: TextStyle(fontSize: 27,fontWeight: FontWeight.bold,),textAlign: TextAlign.center,)),
+            child: Center(child: Text('Завантаження...', style: TextStyle(fontSize: 27,fontWeight: FontWeight.bold,),textAlign: TextAlign.center,)),
           );
         }
         return SliverList.builder(
@@ -225,11 +224,12 @@ class SliverListOfProductsWidget extends StatelessWidget {
 }
 
 class ProductCardWidget extends StatelessWidget {
-  final ProductCard productCard;
   const ProductCardWidget({
     super.key,
     required this.productCard,
   });
+
+  final ProductCard productCard;
 
   @override
   Widget build(BuildContext context) {
@@ -277,7 +277,7 @@ class ProductCardWidget extends StatelessWidget {
                     ),
                 ),
               ),
-              )
+              ),
             ],
           ),
           const SizedBox(
@@ -302,13 +302,13 @@ class ProductCardWidget extends StatelessWidget {
                   height: 10,
                 ),
                 Text('Ціна: ${productCard.currentPrice}',
-                    style: productCardTextStyle),
+                    style: productCardTextStyle,),
                 const SizedBox(
                   height: 10,
                 ),
                 productCard.percentOfSale != null
                     ? Text('% знижки: ${productCard.percentOfSale}',
-                        style: productCardTextStyle)
+                        style: productCardTextStyle,)
                     : const SizedBox(),
                 const SizedBox(
                   height: 10,
@@ -317,7 +317,7 @@ class ProductCardWidget extends StatelessWidget {
                     ? SizedBox(
                       width: 135,
                       child: Text('Минула ціна: ${productCard.oldPrice}',maxLines: 2,overflow: TextOverflow.ellipsis,
-                          style: productCardTextStyle),
+                          style: productCardTextStyle,),
                     )
                     : const SizedBox(),
               ],
@@ -343,7 +343,7 @@ class MarketplaceSelectorWidget extends StatelessWidget {
           return const SizedBox(
             width: 55,
             height: 55,
-            child: Center(child: CircularProgressIndicator()));
+            child: Center(child: CircularProgressIndicator()),);
         }
         return Row(
           children: [
@@ -362,7 +362,7 @@ class MarketplaceSelectorWidget extends StatelessWidget {
                       child: const Text(
                         'Всі',
                         style: defaultTextStyleOfMarkets,
-                      )),
+                      ),),
                 );
               },
             ),
@@ -384,13 +384,13 @@ class MarketplaceSelectorWidget extends StatelessWidget {
                           child: TextButton(
                               onPressed: () {
                                 bloc.add(
-                                    MarketplaceSelectButtonTapEvent(index));
+                                    MarketplaceSelectButtonTapEvent(index),);
                               },
                               style: buttonStyle,
                               child: Text(
                                 bloc.marketsList[index],
                                 style: defaultTextStyleOfMarkets,
-                              )),
+                              ),),
                         );
                       },
                     );
@@ -407,7 +407,7 @@ class MarketplaceSelectorWidget extends StatelessWidget {
 
 
 class _FiltersWidget extends StatefulWidget {
-  _FiltersWidget({super.key});
+  const _FiltersWidget();
 
   @override
   State<_FiltersWidget> createState() => _FiltersWidgetState();
@@ -445,10 +445,10 @@ class _FiltersWidgetState extends State<_FiltersWidget> {
               styleBuilder: (i) {
                 if(i == 0){
                   return const ToggleStyle(
-                indicatorBorderRadius: BorderRadius.only(topLeft: Radius.circular(20)));
+                indicatorBorderRadius: BorderRadius.only(topLeft: Radius.circular(20)),);
                 }
                 return const ToggleStyle(
-                indicatorBorderRadius: BorderRadius.only(topRight: Radius.circular(20)));
+                indicatorBorderRadius: BorderRadius.only(topRight: Radius.circular(20)),);
               },
               onChanged: (i) {
                 value = i;
@@ -477,15 +477,15 @@ class _FiltersWidgetState extends State<_FiltersWidget> {
                     final mainScreenContext = context;
                     // bloc.add(const FilterButtonTapEvent());
                     showDialog(useRootNavigator: false,context: context, builder: (context){
-                      return filtersDialogWidget(mainScreenContext: mainScreenContext);
-                    });
+                      return FiltersDialogWidget(mainScreenContext: mainScreenContext);
+                    },);
                   },
                   style: filterButtonStyleSelector(bloc.isBrandFilersActive),
                   child: const Text(
                     'Фільтр брендів',
                     style: TextStyle(
-                        color: Colors.black, letterSpacing: 10, fontSize: 22),
-                  )),
+                        color: Colors.black, letterSpacing: 10, fontSize: 22,),
+                  ),),
           
         ],
       ),
@@ -500,12 +500,13 @@ ButtonStyle filterButtonStyleSelector(bool isActive){
   return bigFilterButtonDisableStyle;
 }
 
-class filtersDialogWidget extends StatelessWidget {
-  final BuildContext mainScreenContext; 
-  const filtersDialogWidget({
+class FiltersDialogWidget extends StatelessWidget { 
+  const FiltersDialogWidget({
     required this.mainScreenContext,
     super.key,
   });
+
+  final BuildContext mainScreenContext;
 
   @override
   Widget build(BuildContext context) {
@@ -536,7 +537,7 @@ class DialogBrandListTitleWidget extends StatelessWidget {
     super.key,
     required this.brands,
     required this.mainScreenContext,
-    required this.index
+    required this.index,
   });
 
   final int index;
@@ -549,7 +550,7 @@ class DialogBrandListTitleWidget extends StatelessWidget {
       builder: (context,state) {
         return ListTile(
           shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(20))
+            borderRadius: BorderRadius.all(Radius.circular(20)),
           ),
           tileColor: lightBrown,
           selectedTileColor: brown,
@@ -570,7 +571,7 @@ class DialogBrandListTitleWidget extends StatelessWidget {
             mainScreenContext.read<MainScreenBloc>().add(const FilterButtonTapEvent());
             state(() {},);},
         );
-      }
+      },
     );
   }
 }
