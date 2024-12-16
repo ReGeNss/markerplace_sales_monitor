@@ -102,17 +102,14 @@ class MainScreenBloc extends Bloc<MainScreenEvents, MainScreenState>{ // null me
 
   void rebuildProductList(MainScreenState newState){
     late final List<ProductCard> rebuildProductList;
-    switch(newState){
-      case BiggestSaleCategorySelected _:
-        final selectedProducts = _getSelectedMarketplaceProducts(selectedMarketplace);
-        final sortedProducts =_biggestSaleCategoryListBuild(selectedProducts).toList();
-        rebuildProductList = _filterListBySearchQuery(productList: sortedProducts);
-        break;
-      case SmallestPriceCategorySelected _:
-        final selectedProducts = _getSelectedMarketplaceProducts(selectedMarketplace);
-        final sortedProducts = _smallestPriceFilter(selectedProducts).toList(); 
-        rebuildProductList = _filterListBySearchQuery(productList: sortedProducts);
-        break;
+    if (newState is BiggestSaleCategorySelected) {
+      final selectedProducts = _getSelectedMarketplaceProducts(selectedMarketplace);
+      final sortedProducts =_biggestSaleCategoryListBuild(selectedProducts).toList();
+      rebuildProductList = _filterListBySearchQuery(productList: sortedProducts);
+    }else if (newState is SmallestPriceCategorySelected) {
+      final selectedProducts = _getSelectedMarketplaceProducts(selectedMarketplace);
+      final sortedProducts = _smallestPriceFilter(selectedProducts).toList(); 
+      rebuildProductList = _filterListBySearchQuery(productList: sortedProducts);
     }
     _addDataToProductList(rebuildProductList);
   }
