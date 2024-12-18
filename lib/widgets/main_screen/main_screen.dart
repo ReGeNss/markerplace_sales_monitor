@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:markerplace_sales_monitor/repositores/data_service.dart';
+import 'package:markerplace_sales_monitor/entities.dart';
 import 'package:markerplace_sales_monitor/widgets/main_screen/bloc/bloc_events.dart';
 import 'package:markerplace_sales_monitor/widgets/main_screen/bloc/bloc_state.dart';
 import 'package:markerplace_sales_monitor/widgets/main_screen/bloc/main_screen_view_bloc.dart';

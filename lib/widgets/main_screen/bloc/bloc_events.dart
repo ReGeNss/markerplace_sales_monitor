@@ -1,4 +1,4 @@
-import 'package:markerplace_sales_monitor/repositores/data_service.dart';
+import 'package:markerplace_sales_monitor/entities.dart';
 
 abstract class MainScreenEvents{ 
   const MainScreenEvents(); 
