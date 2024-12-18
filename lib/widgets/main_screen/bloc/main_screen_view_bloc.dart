@@ -1,5 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:markerplace_sales_monitor/repositores/data_service.dart';
+import 'package:markerplace_sales_monitor/services/data_service.dart';
 import 'package:markerplace_sales_monitor/widgets/main_screen/bloc/bloc_events.dart';
 import 'package:markerplace_sales_monitor/widgets/main_screen/bloc/bloc_state.dart';
 

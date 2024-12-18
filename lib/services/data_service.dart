@@ -1,22 +1,19 @@
 import 'dart:convert';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:markerplace_sales_monitor/repositores/http_service.dart';
+import 'package:markerplace_sales_monitor/repositores/data_repository.dart';
 
 part 'data_service.g.dart';
 
 class DataService {
-  static const _authority = 'container-function.grayplant-56db7559.westeurope.azurecontainerapps.io';
-  static const _unencodetPath = '/api/httpGetScrapedData';
-  static final httpService = HttpService(); 
+  static final dataRepository = DataRepository(); 
 
   Future<MarketplacesData> getSalesData() async{ 
-    final dataInString = await httpService.getData(_authority, _unencodetPath);
+    final dataInString = await dataRepository.getData();
     final dataJson = jsonDecode(dataInString);
     final data = MarketplacesData.fromJson(dataJson);
     return data;
   }
 }
-
 
 @JsonSerializable(createToJson: false)
 class MarketplacesData{
