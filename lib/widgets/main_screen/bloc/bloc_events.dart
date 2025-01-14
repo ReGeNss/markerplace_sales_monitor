@@ -45,3 +45,13 @@ class LoadingDataCompletedEvent extends MainScreenEvents{
   
   final MarketplacesData data; 
 }
+
+class LoadingDataFailed extends MainScreenEvents{ 
+  const LoadingDataFailed(this.error); 
+
+  final String error; 
+}
+
+class LoadingDataStarted extends MainScreenEvents{ 
+  const LoadingDataStarted(); 
+}

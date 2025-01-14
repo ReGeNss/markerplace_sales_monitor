@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'dart:async';
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:flutter/material.dart';
@@ -210,7 +212,21 @@ class SliverListOfProductsWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bloc = BlocProvider.of<MainScreenBloc>(context);
+    final bloc = context.watch<MainScreenBloc>();
+    if(bloc.state is LoadingDataExeption) {
+      return SliverToBoxAdapter(
+        child: Center(
+          child: Text(
+            (bloc.state as LoadingDataExeption).message,
+            style: TextStyle(
+              fontSize: 27,
+              fontWeight: FontWeight.bold,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ),
+      );
+    }
     return BlocBuilder<MainScreenBloc, MainScreenState>(
       builder: (context, state) {
         if (state is InDataLoad) {
@@ -371,7 +387,10 @@ class MarketplaceSelectorWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bloc = BlocProvider.of<MainScreenBloc>(context);
+    final bloc = context.watch<MainScreenBloc>();
+    if(bloc.state is LoadingDataExeption) {
+      return const SizedBox(); 
+    }
     return BlocBuilder<MainScreenBloc, MainScreenState>(
       builder: (context, state) {
         if (state is InDataLoad) {

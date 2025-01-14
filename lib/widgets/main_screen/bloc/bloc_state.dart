@@ -10,6 +10,18 @@ class InDataLoad extends MainScreenState {
   }
 }
 
+class LoadingDataExeption extends MainScreenState {
+  LoadingDataExeption({this.message = 'Something went wrong'});
+
+  final String message;
+
+  @override
+  LoadingDataExeption copyWith() {
+    return LoadingDataExeption(message: message);
+  }
+}
+
+
 class BiggestSaleCategorySelected extends MainScreenState {
 
   @override

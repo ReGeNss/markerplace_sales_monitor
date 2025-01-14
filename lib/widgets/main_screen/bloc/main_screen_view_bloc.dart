@@ -1,15 +1,18 @@
+import 'dart:io';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:markerplace_sales_monitor/entities.dart';
 import 'package:markerplace_sales_monitor/services/data_service.dart';
 import 'package:markerplace_sales_monitor/widgets/main_screen/bloc/bloc_events.dart';
 import 'package:markerplace_sales_monitor/widgets/main_screen/bloc/bloc_state.dart';
 
+const delayTime = Duration(seconds: 10);
+
 class MainScreenBloc extends Bloc<MainScreenEvents, MainScreenState>{ // null means all marketplaces
   MainScreenBloc() : super(InDataLoad()){
-    _dataService.getSalesData().then((data) => {
-      add(LoadingDataCompletedEvent(data)),
-    },);
-
+    loadData();
+    
+    on<LoadingDataStarted>(_onDataloadingStarted);
+    on<LoadingDataFailed>(_onLoadingDataFail);
     on<AllCategoryButtonTapEvent>(_onAllCategoryButtonTapEvent);
     on<MarketplaceSelectButtonTapEvent>(_onMarketplaceSelectButtonTapEvent);  
     on<BiggestSaleCategoryButtonTapEvent>(_onBiggestSaleCategoryButtonTapEvent);
@@ -17,6 +20,21 @@ class MainScreenBloc extends Bloc<MainScreenEvents, MainScreenState>{ // null me
     on<FilterButtonTapEvent>(_onFilterButtonTapEvent);
     on<SearchTextFieldChangedEvent>(_onSearchTextFieldChangedEvent); 
     on<LoadingDataCompletedEvent>(_onLoadingDataCompletedEvent);
+  }
+
+  Future<void> loadData() async {
+    if(state is LoadingDataExeption){
+      add(const LoadingDataStarted());
+    }
+    try {
+      final salesData = await _dataService.getSalesData();
+      add(LoadingDataCompletedEvent(salesData));
+    } on SocketException {
+      add(const LoadingDataFailed('No internet connection'));
+    } catch(e) {
+      add(LoadingDataFailed('Something went wrong. Error: $e'));
+    }
+    
   }
 
   static final DataService _dataService = DataService();
@@ -148,6 +166,15 @@ class MainScreenBloc extends Bloc<MainScreenEvents, MainScreenState>{ // null me
     final searchQuery = _searchQuery.toLowerCase(); 
     final filteredList = productList.where((element) => element.title.toLowerCase().contains(searchQuery)).toList();
     return filteredList;
+  }
+
+  void _onLoadingDataFail(LoadingDataFailed event, Emitter<MainScreenState> emit){
+    Future.delayed(delayTime, () => loadData());
+    emit(LoadingDataExeption(message: event.error));
+  }
+
+  void _onDataloadingStarted(LoadingDataStarted event, Emitter<MainScreenState> emit){
+    emit(InDataLoad());
   }
 
   void _onAllCategoryButtonTapEvent(AllCategoryButtonTapEvent event, Emitter<MainScreenState> emit){ 
