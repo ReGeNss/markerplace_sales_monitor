@@ -7,20 +7,15 @@ class DataRepository{
   static const _unencodetPath = '/api/httpGetScrapedData';
 
   Future<MarketplacesData> getData() async {
-    final client = http.Client(); 
-    try {
+      final client = http.Client(); 
       final requestUrl = Uri.https(_authority, _unencodetPath);
       final response = await client.get(requestUrl);
       if( response.statusCode != 200){
         throw Exception('Failed to load data: ${response.statusCode}'); 
       }
       client.close();
-      
       final responseJson = response.body;
       final data = jsonDecode(responseJson);
       return MarketplacesData.fromJson(data);
-    } catch (e) {
-      throw Exception('Failed to load data: $e'); 
-    }
   }
 }
