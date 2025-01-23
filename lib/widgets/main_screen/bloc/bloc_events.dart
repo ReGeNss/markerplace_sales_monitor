@@ -43,7 +43,7 @@ class SearchTextFieldChangedEvent extends MainScreenEvents{
 class LoadingDataCompletedEvent extends MainScreenEvents{ 
   const LoadingDataCompletedEvent(this.data); 
   
-  final MarketplacesData data; 
+  final FormatedMarketplacesData data; 
 }
 
 class LoadingDataFailed extends MainScreenEvents{ 
