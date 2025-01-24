@@ -9,6 +9,13 @@ class MarketplacesData{
   factory MarketplacesData.fromJson(Map<String, dynamic> json) => _$MarketplacesDataFromJson(json);
   
   final List<String> marketplaces;
+  final Map<String,List<ProductCard>> brands; 
+}
+
+class FormatedMarketplacesData{
+  FormatedMarketplacesData(this.marketplaces, this.brands);
+
+  final List<String> marketplaces;
   final List<Brand> brands; 
 }
 
@@ -16,7 +23,6 @@ class MarketplacesData{
 class Brand{
   Brand(this.name, this.products,this.isSelected);
 
-  factory Brand.fromJson(Map<String, dynamic> json) => _$BrandFromJson(json);
 
   bool isSelected; 
   final String name;

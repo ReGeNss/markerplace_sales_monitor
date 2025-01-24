@@ -38,7 +38,7 @@ class MainScreenBloc extends Bloc<MainScreenEvents, MainScreenState>{ // null me
   }
 
   static final DataService _dataService = DataService();
-  late final MarketplacesData marketplacesData;
+  late final FormatedMarketplacesData marketplacesData;
   final List<Brand> brands = []; 
   final _productList = <ProductCard>[]; 
   bool isBrandFilersActive = false;
