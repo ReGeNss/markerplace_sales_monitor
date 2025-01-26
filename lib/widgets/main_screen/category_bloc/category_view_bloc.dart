@@ -2,15 +2,14 @@ import 'dart:io';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:markerplace_sales_monitor/entities.dart';
 import 'package:markerplace_sales_monitor/services/data_service.dart';
-import 'package:markerplace_sales_monitor/widgets/main_screen/bloc/bloc_events.dart';
-import 'package:markerplace_sales_monitor/widgets/main_screen/bloc/bloc_state.dart';
+import 'package:markerplace_sales_monitor/widgets/main_screen/category_bloc/category_events.dart';
+import 'package:markerplace_sales_monitor/widgets/main_screen/category_bloc/category_state.dart';
 
 const delayTime = Duration(seconds: 10);
 
 class MainScreenBloc extends Bloc<MainScreenEvents, MainScreenState>{ // null means all marketplaces
-  MainScreenBloc() : super(InDataLoad()){
-    loadData();
-    
+  MainScreenBloc(this.category) : super(InDataLoad()){
+  
     on<LoadingDataStarted>(_onDataloadingStarted);
     on<LoadingDataFailed>(_onLoadingDataFail);
     on<AllCategoryButtonTapEvent>(_onAllCategoryButtonTapEvent);
@@ -22,12 +21,25 @@ class MainScreenBloc extends Bloc<MainScreenEvents, MainScreenState>{ // null me
     on<LoadingDataCompletedEvent>(_onLoadingDataCompletedEvent);
   }
 
+  final String category; 
+  static final DataService _dataService = DataService();
+  late final FormatedMarketplacesData marketplacesData;
+  final List<Brand> brands = []; 
+  final _productList = <ProductCard>[]; 
+  bool isBrandFilersActive = false;
+  String searchQuery = ''; 
+  bool isDataLoaded = false; 
+  bool loading = false;
+
   Future<void> loadData() async {
     if(state is LoadingDataExeption){
       add(const LoadingDataStarted());
     }
     try {
-      final salesData = await _dataService.getSalesData();
+      loading = true;
+      final salesData = await _dataService.getSalesData(category);
+      isDataLoaded = true;
+      loading = false;
       add(LoadingDataCompletedEvent(salesData));
     } on SocketException {
       add(const LoadingDataFailed('No internet connection'));
@@ -36,13 +48,6 @@ class MainScreenBloc extends Bloc<MainScreenEvents, MainScreenState>{ // null me
     }
     
   }
-
-  static final DataService _dataService = DataService();
-  late final FormatedMarketplacesData marketplacesData;
-  final List<Brand> brands = []; 
-  final _productList = <ProductCard>[]; 
-  bool isBrandFilersActive = false;
-  String _searchQuery = ''; 
 
   List<ProductCard> get productList  {
     return _productList;
@@ -147,24 +152,24 @@ class MainScreenBloc extends Bloc<MainScreenEvents, MainScreenState>{ // null me
   }
 
   void _onSearchTextFieldChangedEvent(SearchTextFieldChangedEvent event, Emitter<MainScreenState> emit){
-    final searchQuery = event.text;
-    _searchQuery = searchQuery; 
+    final query = event.text;
+    searchQuery = query; 
     if(event.text.isEmpty){
       rebuildProductList(state);
       emit(state.copyWith());
       return;
     }
-    final filteredList = _filterListBySearchQuery(searchQuery: searchQuery, productList: _productList);
+    final filteredList = _filterListBySearchQuery(productList: _productList);
     _addDataToProductList(filteredList);
     emit(state.copyWith());
   }
 
-  List<ProductCard> _filterListBySearchQuery({String? searchQuery, required List<ProductCard> productList}){
-    if(_searchQuery.isEmpty) {
+  List<ProductCard> _filterListBySearchQuery({required List<ProductCard> productList}){
+    if(searchQuery.isEmpty) {
       return productList; 
     } 
-    final searchQuery = _searchQuery.toLowerCase(); 
-    final filteredList = productList.where((element) => element.title.toLowerCase().contains(searchQuery)).toList();
+    final query = searchQuery.toLowerCase(); 
+    final filteredList = productList.where((element) => element.title.toLowerCase().contains(query)).toList();
     return filteredList;
   }
 
@@ -174,6 +179,10 @@ class MainScreenBloc extends Bloc<MainScreenEvents, MainScreenState>{ // null me
   }
 
   void _onDataloadingStarted(LoadingDataStarted event, Emitter<MainScreenState> emit){
+    if(isDataLoaded){
+      return; 
+    }
+    loadData();
     emit(InDataLoad());
   }
 

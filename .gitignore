@@ -34,7 +34,7 @@ migrate_working_dir/
 /web/
 /windows/
 /macos/
-
+.env
 # Symbolication related
 app.*.symbols
 # Obfuscation related
