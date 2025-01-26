@@ -14,7 +14,7 @@ MarketplacesData _$MarketplacesDataFromJson(Map<String, dynamic> json) =>
             k,
             (e as List<dynamic>)
                 .map((e) => ProductCard.fromJson(e as Map<String, dynamic>))
-                .toList()),
+                .toList(),),
       ),
     );
 
@@ -28,4 +28,11 @@ ProductCard _$ProductCardFromJson(Map<String, dynamic> json) => ProductCard(
       json['imgSrc'] as String,
       json['volume'] as String?,
       json['marketplace'] as String,
+    );
+
+
+Category _$CategoryFromJson(Map<String, dynamic> json) => Category(
+      json['name'] as String,
+      json['iconName'] as String,
+      json['apiRoute'] as String,
     );

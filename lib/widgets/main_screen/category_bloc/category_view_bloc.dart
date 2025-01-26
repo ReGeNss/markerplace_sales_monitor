@@ -2,15 +2,14 @@ import 'dart:io';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:markerplace_sales_monitor/entities.dart';
 import 'package:markerplace_sales_monitor/services/data_service.dart';
-import 'package:markerplace_sales_monitor/widgets/main_screen/bloc/bloc_events.dart';
-import 'package:markerplace_sales_monitor/widgets/main_screen/bloc/bloc_state.dart';
+import 'package:markerplace_sales_monitor/widgets/main_screen/category_bloc/category_events.dart';
+import 'package:markerplace_sales_monitor/widgets/main_screen/category_bloc/category_state.dart';
 
 const delayTime = Duration(seconds: 10);
 
 class MainScreenBloc extends Bloc<MainScreenEvents, MainScreenState>{ // null means all marketplaces
-  MainScreenBloc() : super(InDataLoad()){
-    loadData();
-    
+  MainScreenBloc(this.category) : super(InDataLoad()){
+  
     on<LoadingDataStarted>(_onDataloadingStarted);
     on<LoadingDataFailed>(_onLoadingDataFail);
     on<AllCategoryButtonTapEvent>(_onAllCategoryButtonTapEvent);
@@ -22,27 +21,35 @@ class MainScreenBloc extends Bloc<MainScreenEvents, MainScreenState>{ // null me
     on<LoadingDataCompletedEvent>(_onLoadingDataCompletedEvent);
   }
 
-  Future<void> loadData() async {
-    if(state is LoadingDataExeption){
-      add(const LoadingDataStarted());
-    }
-    try {
-      final salesData = await _dataService.getSalesData();
-      add(LoadingDataCompletedEvent(salesData));
-    } on SocketException {
-      add(const LoadingDataFailed('No internet connection'));
-    } catch(e) {
-      add(LoadingDataFailed('Something went wrong. Error: $e'));
-    }
-    
-  }
-
+  final String category; 
   static final DataService _dataService = DataService();
   late final FormatedMarketplacesData marketplacesData;
   final List<Brand> brands = []; 
   final _productList = <ProductCard>[]; 
   bool isBrandFilersActive = false;
-  String _searchQuery = ''; 
+  String searchQuery = ''; 
+  bool isDataLoaded = false; 
+  bool loading = false;
+
+  Future<void> loadData() async {
+    if(state is LoadingDataExeption){
+      add(const LoadingDataStarted());
+    }
+    try {
+      loading = true;
+      final salesData = await _dataService.getSalesData(category);
+      isDataLoaded = true;
+      loading = false;
+      add(LoadingDataCompletedEvent(salesData));
+    } on SocketException {
+      add(const LoadingDataFailed('No internet connection'));
+    } catch(e) {
+      add(LoadingDataFailed('Something went wrong. Error: $e'));
+    } finally {
+      loading = false;
+    }
+    
+  }
 
   List<ProductCard> get productList  {
     return _productList;
@@ -109,28 +116,31 @@ class MainScreenBloc extends Bloc<MainScreenEvents, MainScreenState>{ // null me
       }
     }
     else{
-    for(final e in marketplacesData.brands){
-      for(final product in e.products){
-        if(product.marketplace == selectedMarketplaceName){
-          selectedMarketplaceData.add(product);
+      for(final e in marketplacesData.brands){
+        for(final product in e.products){
+          if(product.marketplace == selectedMarketplaceName){
+            selectedMarketplaceData.add(product);
+          }
         }
       }
-    }}
+    }
     return selectedMarketplaceData; 
   }
 
   void rebuildProductList(MainScreenState newState){
     late final List<ProductCard> rebuildProductList;
     if (newState is BiggestSaleCategorySelected) {
-      final selectedProducts = _getSelectedMarketplaceProducts(selectedMarketplace);
-      final sortedProducts =_biggestSaleCategoryListBuild(selectedProducts).toList();
-      rebuildProductList = _filterListBySearchQuery(productList: sortedProducts);
+      rebuildProductList = _rebuildBy(_biggestSaleCategoryFilter);
     }else if (newState is SmallestPriceCategorySelected) {
-      final selectedProducts = _getSelectedMarketplaceProducts(selectedMarketplace);
-      final sortedProducts = _smallestPriceFilter(selectedProducts).toList(); 
-      rebuildProductList = _filterListBySearchQuery(productList: sortedProducts);
+      rebuildProductList = _rebuildBy(_smallestPriceFilter); 
     }
     _addDataToProductList(rebuildProductList);
+  }
+
+  List<ProductCard> _rebuildBy(Function(List<ProductCard> productList) filter){
+    final selectedProducts = _getSelectedMarketplaceProducts(selectedMarketplace);
+    final sortedProducts = filter(selectedProducts).toList();
+    return _filterListBySearchQuery(productList: sortedProducts);
   }
 
   List<ProductCard> _smallestPriceFilter(List<ProductCard> productList) {
@@ -147,24 +157,24 @@ class MainScreenBloc extends Bloc<MainScreenEvents, MainScreenState>{ // null me
   }
 
   void _onSearchTextFieldChangedEvent(SearchTextFieldChangedEvent event, Emitter<MainScreenState> emit){
-    final searchQuery = event.text;
-    _searchQuery = searchQuery; 
+    final query = event.text;
+    searchQuery = query; 
     if(event.text.isEmpty){
       rebuildProductList(state);
       emit(state.copyWith());
       return;
     }
-    final filteredList = _filterListBySearchQuery(searchQuery: searchQuery, productList: _productList);
+    final filteredList = _filterListBySearchQuery(productList: _productList);
     _addDataToProductList(filteredList);
     emit(state.copyWith());
   }
 
-  List<ProductCard> _filterListBySearchQuery({String? searchQuery, required List<ProductCard> productList}){
-    if(_searchQuery.isEmpty) {
+  List<ProductCard> _filterListBySearchQuery({required List<ProductCard> productList}){
+    if(searchQuery.isEmpty) {
       return productList; 
     } 
-    final searchQuery = _searchQuery.toLowerCase(); 
-    final filteredList = productList.where((element) => element.title.toLowerCase().contains(searchQuery)).toList();
+    final query = searchQuery.toLowerCase(); 
+    final filteredList = productList.where((element) => element.title.toLowerCase().contains(query)).toList();
     return filteredList;
   }
 
@@ -174,6 +184,10 @@ class MainScreenBloc extends Bloc<MainScreenEvents, MainScreenState>{ // null me
   }
 
   void _onDataloadingStarted(LoadingDataStarted event, Emitter<MainScreenState> emit){
+    if(isDataLoaded){
+      return; 
+    }
+    loadData();
     emit(InDataLoad());
   }
 
@@ -197,7 +211,7 @@ class MainScreenBloc extends Bloc<MainScreenEvents, MainScreenState>{ // null me
     emit(BiggestSaleCategorySelected());
   }
 
-  List<ProductCard> _biggestSaleCategoryListBuild(List<ProductCard> productList) {
+  List<ProductCard> _biggestSaleCategoryFilter(List<ProductCard> productList) {
     final productListWithSale = productList.where((e) => e.percentOfSale != null).toList();
     productListWithSale.sort((a, b) => b.percentOfSale!.compareTo(a.percentOfSale!));
     return productListWithSale;

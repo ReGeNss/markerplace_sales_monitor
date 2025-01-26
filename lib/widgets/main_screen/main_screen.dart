@@ -5,9 +5,10 @@ import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:markerplace_sales_monitor/entities.dart';
-import 'package:markerplace_sales_monitor/widgets/main_screen/bloc/bloc_events.dart';
-import 'package:markerplace_sales_monitor/widgets/main_screen/bloc/bloc_state.dart';
-import 'package:markerplace_sales_monitor/widgets/main_screen/bloc/main_screen_view_bloc.dart';
+import 'package:markerplace_sales_monitor/widgets/main_screen/category_bloc/category_events.dart';
+import 'package:markerplace_sales_monitor/widgets/main_screen/category_bloc/category_state.dart';
+import 'package:markerplace_sales_monitor/widgets/main_screen/category_bloc/category_view_bloc.dart';
+import 'package:markerplace_sales_monitor/widgets/main_screen/page_switcher_bloc/page_switcher_bloc.dart';
 
 final Decoration selectedElement = BoxDecoration(
   borderRadius: BorderRadius.circular(20),
@@ -91,65 +92,248 @@ class MainScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      lazy: false,
-      create: (context) => MainScreenBloc(),
+      create: (context) => PageSwitcherBloc(),
       child: Scaffold(
-        body: CustomScrollView(
-          slivers: [
-            SliverToBoxAdapter(
-              child: Container(
-                decoration: defaultDecoration,
-                margin: const EdgeInsets.only(top: 25, left: 20, right: 20),
-                height: 200,
-                child: const Center(
-                  child: Text(
-                    'Всі знижки саме тут!',
-                    style: TextStyle(fontSize: 30),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              ),
-            ),
-            const SliverAppBar(
-              centerTitle: true,
-              surfaceTintColor: Colors.transparent,
-              toolbarHeight: 0,
-              snap: true,
-              primary: false,
-              pinned: true,
-              floating: true,
-              bottom: PreferredSize(
-                preferredSize: Size.fromHeight(290),
-                child: Padding(
-                  padding: EdgeInsets.only(left: 20, right: 20),
-                  child: Column(
-                    children: [
-                      SizedBox(
-                        height: 25,
-                      ),
-                      SearchTextFieldWidget(),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      _FiltersWidget(),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      MarketplaceSelectorWidget(),
-                      SizedBox(
-                        height: 10,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            const SliverPadding(
-              padding: EdgeInsets.symmetric(horizontal: 20),
-              sliver: SliverListOfProductsWidget(),
-            ),
-          ],
+        body: MainScreenBody(),
+      ),
+    );
+  }
+}
+
+class MainScreenBody extends StatelessWidget {
+  MainScreenBody({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final bloc = context.watch<PageSwitcherBloc>();
+    if (bloc.state is CatigoriesLoading) {
+      return Center(child: CircularProgressIndicatorWidget());
+    }
+    if (bloc.state is Error) {
+      return Center(
+          child: Text(
+        (bloc.state as Error).error,
+        style: defaultTextStyleOfSaleFilters,
+      ),);
+    }
+    return Column(
+      children: [
+        Expanded(
+          child: PageView(
+            controller: bloc.controller,
+            children: bloc.catigories
+                .map(
+                  (category) => CategoryScreenWidget(category: category),
+                )
+                .toList(),
+          ),
         ),
+        Divider(
+          height: 2,
+          thickness: 2,
+          color: lightBrown,
+        ),
+        NavigationBarWidget(),
+      ],
+    );
+  }
+}
+
+const icons = [Icons.local_drink_outlined, ];
+
+class NavigationBarWidget extends StatelessWidget {
+  const NavigationBarWidget({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final bloc = context.watch<PageSwitcherBloc>();
+    return BottomNavigationBar(
+      selectedLabelStyle: defaultTextStyleOfSaleFilters,
+      unselectedLabelStyle: defaultTextStyleOfMarkets,
+      showUnselectedLabels: true,
+      iconSize: 28,
+      selectedFontSize: 16,
+      unselectedFontSize: 14,
+      currentIndex: bloc.currentCatigoryIndex,
+      useLegacyColorScheme: false,
+      unselectedItemColor: Colors.black,
+      selectedItemColor: Colors.black,
+      items: List.generate(
+        bloc.catigories.length,
+        (index) => BottomNavigationBarItem(
+          icon: Icon(
+            IconData(
+              int.parse(bloc.catigories[index].iconName),
+              fontFamily: 'MaterialIcons'
+            )
+          ),
+          backgroundColor: brown,
+          label: bloc.catigories.elementAt(index).name,
+        ),
+      ),
+      onTap: (index) {
+        bloc.controller.animateToPage(
+          index,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeIn,
+        );
+      },
+    );
+  }
+}
+
+
+// class PageIndicator extends StatefulWidget {
+//   PageIndicator({super.key});
+
+//   @override
+//   State<PageIndicator> createState() => _PageIndicatorState();
+// }
+
+// class _PageIndicatorState extends State<PageIndicator> {
+//   int currentPage = 0;
+
+//   // TODO: indicators should have same height
+//   @override
+//   Widget build(BuildContext context) {
+//     final bloc = context.watch<PageSwitcherBloc>();
+//     return SizedBox(
+//       width: double.infinity,
+//       child: AnimatedToggleSwitch.size(
+//         selectedIconScale: 1.2,
+//         borderWidth: 0,
+//         animationDuration: const Duration(milliseconds: 300),
+//         height: 120,
+//         current: bloc.currentCatigoryIndex,
+//         indicatorSize: Size(100, 120),
+//         values: List.generate(bloc.catigories.length, (index) => index),
+//         onChanged: (value) {
+//           print('value: $value');
+//           currentPage = value;
+//           bloc.controller.animateToPage(
+//             value,
+//             duration: const Duration(milliseconds: 300),
+//             curve: Curves.easeIn,
+//           );
+//           setState(() {});
+//         },
+//         style: ToggleStyle(
+//           backgroundColor: defaultColor,
+//           borderRadius: BorderRadius.only(
+//             topLeft: Radius.circular(20),
+//             topRight: Radius.circular(20),
+//           ),
+//           indicatorColor: const Color.fromRGBO(106, 96, 96, 1),
+//         ),
+//         iconList: bloc.catigories.map((category) {
+//           return PageIconIndicator(categoryName: category.name);
+//         }).toList(),
+//       ),
+//     );
+//   }
+// }
+
+// class PageIconIndicator extends StatelessWidget {
+//   const PageIconIndicator({
+//     super.key,
+//     required this.categoryName,
+//   });
+
+//   final String categoryName;
+//   @override
+//   Widget build(BuildContext context) {
+//     return Expanded(
+//       child: SizedBox(
+//         height: 70,
+//         child: Column(
+//           children: [
+//             Icon(IconData('local_drink_outlined'.hashCode, fontFamily: 'MaterialIcons')),
+//             Text(
+//               categoryName,
+//               style: defaultTextStyleOfSaleFilters,
+//               maxLines: 3,
+//               overflow: TextOverflow.ellipsis,
+//               textAlign: TextAlign.center,
+//             ),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }
+
+class CategoryScreenWidget extends StatelessWidget {
+  const CategoryScreenWidget({
+    super.key,
+    required this.category,
+  });
+
+  final Category category; 
+
+  @override
+  Widget build(BuildContext context) {
+    final bloc = BlocProvider.of<PageSwitcherBloc>(context);
+    return BlocProvider.value(
+      value: bloc.mainScreenBlocs.firstWhere((bloc) => bloc.category == category.apiRoute),
+      child: CustomScrollView(
+        slivers: [
+          SliverToBoxAdapter(
+            child: Container(
+              decoration: defaultDecoration,
+              margin: const EdgeInsets.only(top: 25, left: 20, right: 20),
+              height: 200,
+              child: Center(
+                child: Text(
+                  category.name,
+                  style: TextStyle(fontSize: 30),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ),
+          ),
+          SliverAppBar(
+            centerTitle: true,
+            surfaceTintColor: Colors.transparent,
+            toolbarHeight: 0,
+            snap: true,
+            primary: false,
+            pinned: true,
+            floating: true,
+            bottom: PreferredSize(
+              preferredSize: Size.fromHeight(290),
+              child: Padding(
+                padding: EdgeInsets.only(left: 20, right: 20),
+                child: Column(
+                  children: const [
+                    SizedBox(
+                      height: 25,
+                    ),
+                    SearchTextFieldWidget(),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    _FiltersWidget(),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    MarketplaceSelectorWidget(),
+                    SizedBox(
+                      height: 10,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          const SliverPadding(
+            padding: EdgeInsets.symmetric(horizontal: 20),
+            sliver: SliverListOfProductsWidget(),
+          ),
+        ],
       ),
     );
   }
@@ -166,6 +350,7 @@ class SearchTextFieldWidget extends StatelessWidget {
     Timer? timer;
     final textFieldFocus = FocusNode();
     return TextField(
+      controller: TextEditingController(text: bloc.searchQuery),
       focusNode: textFieldFocus,
       decoration: InputDecoration(
         filled: true,
@@ -213,7 +398,7 @@ class SliverListOfProductsWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bloc = context.watch<MainScreenBloc>();
-    if(bloc.state is LoadingDataExeption) {
+    if (bloc.state is LoadingDataExeption) {
       return SliverToBoxAdapter(
         child: Center(
           child: Text(
@@ -232,14 +417,15 @@ class SliverListOfProductsWidget extends StatelessWidget {
         if (state is InDataLoad) {
           return const SliverToBoxAdapter(
             child: Center(
-                child: Text(
-                  'Завантаження...',
-                  style: TextStyle(
-                   fontSize: 27,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  textAlign: TextAlign.center,
-            ),),
+              child: Text(
+                'Завантаження...',
+                style: TextStyle(
+                  fontSize: 27,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
           );
         }
         return SliverList.builder(
@@ -285,7 +471,7 @@ class ProductCardWidget extends StatelessWidget {
                     ? Text(
                         productCard.marketplace,
                         style:
-                          const TextStyle(color: Colors.white, fontSize: 17),
+                            const TextStyle(color: Colors.white, fontSize: 17),
                       )
                     : const SizedBox(height: 21),
               ),
@@ -380,6 +566,19 @@ class ProductCardWidget extends StatelessWidget {
   }
 }
 
+const screenPaddingsSize = 20;
+const allButtonSize = 64;
+const buttonsSpacing = 10;
+
+double calcButtonsWidth(int countOfCategories, double screenWidth) {
+  final result = (screenWidth - allButtonSize - buttonsSpacing - screenPaddingsSize * 2 - (countOfCategories - 1) * buttonsSpacing) /
+      countOfCategories;
+  if(result < 75) {
+    return 75;
+  }
+  return result;
+}
+
 class MarketplaceSelectorWidget extends StatelessWidget {
   const MarketplaceSelectorWidget({
     super.key,
@@ -388,27 +587,27 @@ class MarketplaceSelectorWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bloc = context.watch<MainScreenBloc>();
-    if(bloc.state is LoadingDataExeption) {
-      return const SizedBox(); 
+    if (bloc.state is LoadingDataExeption) {
+      return const SizedBox();
     }
     return BlocBuilder<MainScreenBloc, MainScreenState>(
       builder: (context, state) {
         if (state is InDataLoad) {
-          return const SizedBox(
-            width: 55,
-            height: 55,
-            child: Center(child: CircularProgressIndicator()),
-          );
+          return CircularProgressIndicatorWidget();
         }
+        final screenWidth = MediaQuery.of(context).size.width;
+        final itemWidth = calcButtonsWidth(bloc.countOfCategories, screenWidth);
+            bloc.countOfCategories;
         return Row(
           children: [
             BlocBuilder<MainScreenBloc, MainScreenState>(
               builder: (context, state) {
                 return Container(
+                  width: 64,
                   decoration: bloc.selectedMarketplace == null
                       ? selectedElement
                       : defaultDecoration,
-                  margin: const EdgeInsets.only(right: 10),
+                  margin: EdgeInsets.only(right: buttonsSpacing.toDouble()),
                   child: TextButton(
                     onPressed: () {
                       bloc.add(const AllCategoryButtonTapEvent());
@@ -432,7 +631,9 @@ class MarketplaceSelectorWidget extends StatelessWidget {
                       scrollDirection: Axis.horizontal,
                       itemCount: bloc.countOfCategories,
                       itemBuilder: (context, index) {
+   
                         return Container(
+                          width: itemWidth,
                           decoration: bloc.selectedMarketplace == index
                               ? selectedElement
                               : defaultDecoration,
@@ -463,20 +664,34 @@ class MarketplaceSelectorWidget extends StatelessWidget {
   }
 }
 
-class _FiltersWidget extends StatefulWidget {
-  const _FiltersWidget();
-
-  @override
-  State<_FiltersWidget> createState() => _FiltersWidgetState();
-}
-
-class _FiltersWidgetState extends State<_FiltersWidget> {
-  int value = 0;
+class CircularProgressIndicatorWidget extends StatelessWidget {
+  const CircularProgressIndicatorWidget({
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
+    return const SizedBox(
+      width: 55,
+      height: 55,
+      child: Center(child: CircularProgressIndicator()),
+    );
+  }
+}
+
+class _FiltersWidget extends StatelessWidget {
+  const _FiltersWidget();
+
+  @override
+  Widget build(BuildContext context) {
+    int value;
     // final bloc = BlocProvider.of<MainScreenBloc>(context);
     final bloc = context.watch<MainScreenBloc>();
+    if(bloc.state is SmallestPriceCategorySelected){
+      value = 1;
+    }else{ 
+      value = 0;
+    }
     return Container(
       height: 121,
       decoration: defaultDecoration,
@@ -515,13 +730,11 @@ class _FiltersWidgetState extends State<_FiltersWidget> {
                 );
               },
               onChanged: (i) {
-                value = i;
                 if (i == 0) {
                   bloc.add(const BiggestSaleCategoryButtonTapEvent());
                 } else {
                   bloc.add(const SmallestPriceCategoryButtonTapEvent());
                 }
-                setState(() {});
               },
               iconBuilder: (i) {
                 if (i == 0) {
