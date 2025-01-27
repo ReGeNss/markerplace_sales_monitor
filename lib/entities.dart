@@ -19,10 +19,8 @@ class FormatedMarketplacesData{
   final List<Brand> brands; 
 }
 
-@JsonSerializable(createToJson: false)
 class Brand{
   Brand(this.name, this.products,this.isSelected);
-
 
   bool isSelected; 
   final String name;
@@ -52,4 +50,15 @@ class ProductCard{
 
   @override 
   String toString() => 'title: $title, currentPrice: $currentPrice, oldPrice: $oldPrice, imgSrc: $imgSrc, percentOfSale: $percentOfSale';
+}
+
+@JsonSerializable(createToJson: false)
+class Category{
+  Category(this.name, this.iconName, this.apiRoute);
+
+  factory Category.fromJson(Map<String, dynamic> json) => _$CategoryFromJson(json);
+  
+  final String name;
+  final String apiRoute;  
+  final String iconName;
 }
