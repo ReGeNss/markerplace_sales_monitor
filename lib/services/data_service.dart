@@ -26,5 +26,3 @@ class DataService {
   Future<void> setThemeData(bool value) async {
     await dataRepository.setThemeData(value);
   }
-
-}

@@ -52,4 +52,3 @@ class DataRepository{
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setBool('ligthTheme', value);
   }
-}

@@ -205,7 +205,6 @@ class CategoryScreenWidget extends StatelessWidget {
     super.key,
     required this.category,
   });
-
   final Category category;
 
   @override
@@ -593,6 +592,7 @@ class MarketplaceSelectorWidget extends StatelessWidget {
                       scrollDirection: Axis.horizontal,
                       itemCount: bloc.countOfCategories,
                       itemBuilder: (context, index) {
+   
                         return Container(
                           width: itemWidth,
                           decoration: bloc.selectedMarketplace == index
