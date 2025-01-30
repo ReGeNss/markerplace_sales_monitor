@@ -45,6 +45,8 @@ class MainScreenBloc extends Bloc<MainScreenEvents, MainScreenState>{ // null me
       add(const LoadingDataFailed('No internet connection'));
     } catch(e) {
       add(LoadingDataFailed('Something went wrong. Error: $e'));
+    } finally {
+      loading = false;
     }
     
   }
@@ -114,28 +116,31 @@ class MainScreenBloc extends Bloc<MainScreenEvents, MainScreenState>{ // null me
       }
     }
     else{
-    for(final e in marketplacesData.brands){
-      for(final product in e.products){
-        if(product.marketplace == selectedMarketplaceName){
-          selectedMarketplaceData.add(product);
+      for(final e in marketplacesData.brands){
+        for(final product in e.products){
+          if(product.marketplace == selectedMarketplaceName){
+            selectedMarketplaceData.add(product);
+          }
         }
       }
-    }}
+    }
     return selectedMarketplaceData; 
   }
 
   void rebuildProductList(MainScreenState newState){
     late final List<ProductCard> rebuildProductList;
     if (newState is BiggestSaleCategorySelected) {
-      final selectedProducts = _getSelectedMarketplaceProducts(selectedMarketplace);
-      final sortedProducts =_biggestSaleCategoryListBuild(selectedProducts).toList();
-      rebuildProductList = _filterListBySearchQuery(productList: sortedProducts);
+      rebuildProductList = _rebuildBy(_biggestSaleCategoryFilter);
     }else if (newState is SmallestPriceCategorySelected) {
-      final selectedProducts = _getSelectedMarketplaceProducts(selectedMarketplace);
-      final sortedProducts = _smallestPriceFilter(selectedProducts).toList(); 
-      rebuildProductList = _filterListBySearchQuery(productList: sortedProducts);
+      rebuildProductList = _rebuildBy(_smallestPriceFilter); 
     }
     _addDataToProductList(rebuildProductList);
+  }
+
+  List<ProductCard> _rebuildBy(Function(List<ProductCard> productList) filter){
+    final selectedProducts = _getSelectedMarketplaceProducts(selectedMarketplace);
+    final sortedProducts = filter(selectedProducts).toList();
+    return _filterListBySearchQuery(productList: sortedProducts);
   }
 
   List<ProductCard> _smallestPriceFilter(List<ProductCard> productList) {
@@ -206,7 +211,7 @@ class MainScreenBloc extends Bloc<MainScreenEvents, MainScreenState>{ // null me
     emit(BiggestSaleCategorySelected());
   }
 
-  List<ProductCard> _biggestSaleCategoryListBuild(List<ProductCard> productList) {
+  List<ProductCard> _biggestSaleCategoryFilter(List<ProductCard> productList) {
     final productListWithSale = productList.where((e) => e.percentOfSale != null).toList();
     productListWithSale.sort((a, b) => b.percentOfSale!.compareTo(a.percentOfSale!));
     return productListWithSale;

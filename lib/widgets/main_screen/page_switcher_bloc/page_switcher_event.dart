@@ -4,9 +4,9 @@ part of 'page_switcher_bloc.dart';
 sealed class PageSwitcherEvent {}
 
 final class CatigoriesLoaded extends PageSwitcherEvent {
-  final List<Category> catigories;
-
   CatigoriesLoaded(this.catigories);
+  
+  final List<Category> catigories;
 }
 
 final class CatigoriesLoadingFailed extends PageSwitcherEvent {

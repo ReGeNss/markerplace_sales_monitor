@@ -19,4 +19,11 @@ class DataService {
     return await dataRepository.getCatigoriesData();
   }
 
+  Future<bool?> getThemeData() async {
+    return await dataRepository.getThemeData();
+  }
+
+  Future<void> setThemeData(bool value) async {
+    await dataRepository.setThemeData(value);
+  }
 }
