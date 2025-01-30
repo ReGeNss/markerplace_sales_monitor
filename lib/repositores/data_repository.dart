@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:markerplace_sales_monitor/entities.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class DataRepository{
   final getCatigoryPath = 'categories';
@@ -40,5 +41,15 @@ class DataRepository{
       final dataJson = jsonDecode(responseJson);
       final data =  dataJson.map<Category>((e) => Category.fromJson(e)).toList();
       return data;
+  }
+
+  Future<bool?> getThemeData() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getBool('ligthTheme');
+  }
+
+  Future<void> setThemeData(bool value) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('ligthTheme', value);
   }
 }

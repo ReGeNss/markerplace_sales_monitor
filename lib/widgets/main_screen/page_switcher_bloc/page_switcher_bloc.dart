@@ -31,7 +31,7 @@ class PageSwitcherBloc extends Bloc<PageSwitcherEvent, PageSwitcherState> {
       final catigoriesData = await _dataService.getCatigoriesData();
       add(CatigoriesLoaded(catigoriesData));
     } on SocketException {
-      add(CatigoriesLoadingFailed('Error: '));
+      add(CatigoriesLoadingFailed('Error: no internet connection'));
     } catch(e) {
       add(CatigoriesLoadingFailed('Something went wrong. Error: $e'));
     }

@@ -5,86 +5,94 @@ import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:markerplace_sales_monitor/entities.dart';
+import 'package:markerplace_sales_monitor/main_app.dart';
 import 'package:markerplace_sales_monitor/widgets/main_screen/category_bloc/category_events.dart';
 import 'package:markerplace_sales_monitor/widgets/main_screen/category_bloc/category_state.dart';
 import 'package:markerplace_sales_monitor/widgets/main_screen/category_bloc/category_view_bloc.dart';
 import 'package:markerplace_sales_monitor/widgets/main_screen/page_switcher_bloc/page_switcher_bloc.dart';
-
-final Decoration selectedElement = BoxDecoration(
-  borderRadius: BorderRadius.circular(20),
-  color: const Color.fromRGBO(106, 96, 96, 0.9),
-);
+import 'package:markerplace_sales_monitor/widgets/main_screen/theme_bloc/theme_bloc.dart';
 
 const TextStyle defaultTextStyleOfMarkets =
-    TextStyle(color: Colors.black, fontSize: 15);
+    TextStyle(color: Colors.black, fontSize: 16);
 
 const TextStyle defaultTextStyleOfSaleFilters =
-    TextStyle(color: Colors.black, fontSize: 17, fontWeight: FontWeight.w500);
+    TextStyle(color: Colors.black, fontSize: 18, fontWeight: FontWeight.w500);
 
 const TextStyle productCardTextStyle =
-    TextStyle(color: Colors.white, fontSize: 15);
+    TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500);
 
-const Color defaultColor = Color.fromRGBO(217, 217, 217, 1);
+Decoration defaultDecoration(BuildContext context) {
+  return BoxDecoration(
+    borderRadius: BorderRadius.circular(20),
+    color: context.color.cardTextColor,
+  );
+}
 
-const Color brown = Color.fromRGBO(106, 96, 96, 1);
+Decoration selectedElementDecoration(BuildContext context) {
+  return BoxDecoration(
+    borderRadius: BorderRadius.circular(20),
+    color: context.color.selectedWidgetsColor, 
+  );
+}
 
-const Color lightBrown = Color.fromRGBO(106, 96, 96, 0.5);
+ButtonStyle marketplacesButtonStyle(BuildContext context) {
 
-BoxDecoration defaultDecoration = BoxDecoration(
-  borderRadius: BorderRadius.circular(20),
-  color: defaultColor,
-);
-
-ButtonStyle buttonStyle = ButtonStyle(
-  overlayColor: const WidgetStatePropertyAll<Color>(
-    Color.fromRGBO(106, 96, 96, 0.5),
-  ),
-  fixedSize: const WidgetStatePropertyAll<Size>(
-    Size.fromHeight(55),
-  ),
-  shape: WidgetStatePropertyAll(
-    RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(20),
+  return ButtonStyle(
+    overlayColor: WidgetStateProperty.all(
+      context.color.unSelectedWidgetsColor,
     ),
-  ),
-);
-
-ButtonStyle filterButtonDisableStyle = const ButtonStyle(
-  overlayColor: WidgetStatePropertyAll<Color>(
-    Color.fromRGBO(217, 217, 217, 1),
-  ),
-  fixedSize: WidgetStatePropertyAll<Size>(
-    Size(2000, 60),
-  ),
-  shape: WidgetStatePropertyAll(
-    RoundedRectangleBorder(
-      borderRadius: BorderRadius.only(
-        bottomLeft: Radius.circular(20),
-        bottomRight: Radius.circular(20),
+    fixedSize: WidgetStateProperty.all(
+      const Size.fromHeight(55),
+    ),
+    shape: WidgetStateProperty.all(
+      RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
       ),
     ),
-  ),
-);
+  );
+}
 
-ButtonStyle filterButtonActiveStyle = const ButtonStyle(
-  overlayColor: WidgetStatePropertyAll<Color>(
-    brown,
-  ),
-  backgroundColor: WidgetStatePropertyAll<Color>(
-    brown,
-  ),
-  fixedSize: WidgetStatePropertyAll<Size>(
-    Size(2000, 60),
-  ),
-  shape: WidgetStatePropertyAll(
-    RoundedRectangleBorder(
-      borderRadius: BorderRadius.only(
-        bottomLeft: Radius.circular(20),
-        bottomRight: Radius.circular(20),
+ButtonStyle filterButtonDisableStyle(BuildContext context) {
+
+  return ButtonStyle(
+    overlayColor: WidgetStateProperty.all(
+      context.color.cardTextColor, 
+    ),
+    fixedSize: WidgetStateProperty.all(
+      const Size(2000, 60),
+    ),
+    shape: WidgetStateProperty.all(
+      const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          bottomLeft: Radius.circular(20),
+          bottomRight: Radius.circular(20),
+        ),
       ),
     ),
-  ),
-);
+  );
+}
+
+ButtonStyle filterButtonActiveStyle(BuildContext context) {
+  return ButtonStyle(
+    overlayColor: WidgetStateProperty.all(
+      context.color.selectedWidgetsColor, 
+    ),
+    backgroundColor: WidgetStateProperty.all(
+      context.color.selectedWidgetsColor,
+    ),
+    fixedSize: WidgetStateProperty.all(
+      const Size(2000, 60),
+    ),
+    shape: WidgetStateProperty.all(
+      const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          bottomLeft: Radius.circular(20),
+          bottomRight: Radius.circular(20),
+        ),
+      ),
+    ),
+  );
+}
 
 class MainScreen extends StatelessWidget {
   const MainScreen({super.key});
@@ -94,6 +102,7 @@ class MainScreen extends StatelessWidget {
     return BlocProvider(
       create: (context) => PageSwitcherBloc(),
       child: Scaffold(
+        backgroundColor: context.color.backgroundClolor,
         body: MainScreenBody(),
       ),
     );
@@ -101,7 +110,7 @@ class MainScreen extends StatelessWidget {
 }
 
 class MainScreenBody extends StatelessWidget {
-  MainScreenBody({
+  const MainScreenBody({
     super.key,
   });
 
@@ -113,10 +122,13 @@ class MainScreenBody extends StatelessWidget {
     }
     if (bloc.state is Error) {
       return Center(
-          child: Text(
-        (bloc.state as Error).error,
-        style: defaultTextStyleOfSaleFilters,
-      ),);
+        child: Text(
+          (bloc.state as Error).error,
+          style: defaultTextStyleOfSaleFilters.copyWith(
+            color: context.color.textColor,
+          ),
+        ),
+      );
     }
     return Column(
       children: [
@@ -133,15 +145,13 @@ class MainScreenBody extends StatelessWidget {
         Divider(
           height: 2,
           thickness: 2,
-          color: lightBrown,
+          color: context.color.unSelectedWidgetsColor,
         ),
         NavigationBarWidget(),
       ],
     );
   }
 }
-
-const icons = [Icons.local_drink_outlined, ];
 
 class NavigationBarWidget extends StatelessWidget {
   const NavigationBarWidget({
@@ -152,26 +162,30 @@ class NavigationBarWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final bloc = context.watch<PageSwitcherBloc>();
     return BottomNavigationBar(
-      selectedLabelStyle: defaultTextStyleOfSaleFilters,
-      unselectedLabelStyle: defaultTextStyleOfMarkets,
+      selectedLabelStyle: defaultTextStyleOfSaleFilters.copyWith(
+        color: context.color.textColor,
+      ),
+      unselectedLabelStyle: defaultTextStyleOfMarkets.copyWith(
+        color: context.color.textColor,
+      ),
       showUnselectedLabels: true,
       iconSize: 28,
       selectedFontSize: 16,
       unselectedFontSize: 14,
       currentIndex: bloc.currentCatigoryIndex,
       useLegacyColorScheme: false,
-      unselectedItemColor: Colors.black,
-      selectedItemColor: Colors.black,
+      unselectedItemColor: context.color.textColor,
+      selectedItemColor: context.color.textColor,
       items: List.generate(
         bloc.catigories.length,
         (index) => BottomNavigationBarItem(
           icon: Icon(
             IconData(
               int.parse(bloc.catigories[index].iconName),
-              fontFamily: 'MaterialIcons'
-            )
+              fontFamily: 'MaterialIcons',
+            ),
           ),
-          backgroundColor: brown,
+          backgroundColor: context.color.selectedWidgetsColor,
           label: bloc.catigories.elementAt(index).name,
         ),
       ),
@@ -186,111 +200,36 @@ class NavigationBarWidget extends StatelessWidget {
   }
 }
 
-
-// class PageIndicator extends StatefulWidget {
-//   PageIndicator({super.key});
-
-//   @override
-//   State<PageIndicator> createState() => _PageIndicatorState();
-// }
-
-// class _PageIndicatorState extends State<PageIndicator> {
-//   int currentPage = 0;
-
-//   // TODO: indicators should have same height
-//   @override
-//   Widget build(BuildContext context) {
-//     final bloc = context.watch<PageSwitcherBloc>();
-//     return SizedBox(
-//       width: double.infinity,
-//       child: AnimatedToggleSwitch.size(
-//         selectedIconScale: 1.2,
-//         borderWidth: 0,
-//         animationDuration: const Duration(milliseconds: 300),
-//         height: 120,
-//         current: bloc.currentCatigoryIndex,
-//         indicatorSize: Size(100, 120),
-//         values: List.generate(bloc.catigories.length, (index) => index),
-//         onChanged: (value) {
-//           print('value: $value');
-//           currentPage = value;
-//           bloc.controller.animateToPage(
-//             value,
-//             duration: const Duration(milliseconds: 300),
-//             curve: Curves.easeIn,
-//           );
-//           setState(() {});
-//         },
-//         style: ToggleStyle(
-//           backgroundColor: defaultColor,
-//           borderRadius: BorderRadius.only(
-//             topLeft: Radius.circular(20),
-//             topRight: Radius.circular(20),
-//           ),
-//           indicatorColor: const Color.fromRGBO(106, 96, 96, 1),
-//         ),
-//         iconList: bloc.catigories.map((category) {
-//           return PageIconIndicator(categoryName: category.name);
-//         }).toList(),
-//       ),
-//     );
-//   }
-// }
-
-// class PageIconIndicator extends StatelessWidget {
-//   const PageIconIndicator({
-//     super.key,
-//     required this.categoryName,
-//   });
-
-//   final String categoryName;
-//   @override
-//   Widget build(BuildContext context) {
-//     return Expanded(
-//       child: SizedBox(
-//         height: 70,
-//         child: Column(
-//           children: [
-//             Icon(IconData('local_drink_outlined'.hashCode, fontFamily: 'MaterialIcons')),
-//             Text(
-//               categoryName,
-//               style: defaultTextStyleOfSaleFilters,
-//               maxLines: 3,
-//               overflow: TextOverflow.ellipsis,
-//               textAlign: TextAlign.center,
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
-
 class CategoryScreenWidget extends StatelessWidget {
   const CategoryScreenWidget({
     super.key,
     required this.category,
   });
 
-  final Category category; 
+  final Category category;
 
   @override
   Widget build(BuildContext context) {
     final bloc = BlocProvider.of<PageSwitcherBloc>(context);
     return BlocProvider.value(
-      value: bloc.mainScreenBlocs.firstWhere((bloc) => bloc.category == category.apiRoute),
+      value: bloc.mainScreenBlocs
+          .firstWhere((bloc) => bloc.category == category.apiRoute),
       child: CustomScrollView(
         slivers: [
           SliverToBoxAdapter(
             child: Container(
-              decoration: defaultDecoration,
+              decoration: defaultDecoration(context),
               margin: const EdgeInsets.only(top: 25, left: 20, right: 20),
               height: 200,
               child: Center(
                 child: Text(
                   category.name,
-                  style: TextStyle(fontSize: 30),
-                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      fontSize: 35,
+                      color: context.color.textColor,
+                      letterSpacing: 12,
+                      fontWeight: FontWeight.w600,
+                    ),
                 ),
               ),
             ),
@@ -298,6 +237,7 @@ class CategoryScreenWidget extends StatelessWidget {
           SliverAppBar(
             centerTitle: true,
             surfaceTintColor: Colors.transparent,
+            backgroundColor: context.color.backgroundClolor,
             toolbarHeight: 0,
             snap: true,
             primary: false,
@@ -308,7 +248,7 @@ class CategoryScreenWidget extends StatelessWidget {
               child: Padding(
                 padding: EdgeInsets.only(left: 20, right: 20),
                 child: Column(
-                  children: const [
+                  children: [
                     SizedBox(
                       height: 25,
                     ),
@@ -340,52 +280,74 @@ class CategoryScreenWidget extends StatelessWidget {
 }
 
 class SearchTextFieldWidget extends StatelessWidget {
-  const SearchTextFieldWidget({
+  SearchTextFieldWidget({
     super.key,
   });
+  final textFieldFocus = FocusNode(); 
 
   @override
   Widget build(BuildContext context) {
     final bloc = BlocProvider.of<MainScreenBloc>(context);
     Timer? timer;
-    final textFieldFocus = FocusNode();
-    return TextField(
-      controller: TextEditingController(text: bloc.searchQuery),
-      focusNode: textFieldFocus,
-      decoration: InputDecoration(
-        filled: true,
-        fillColor: defaultColor,
-        hintText: 'Пошук',
-        prefixIcon: const Icon(Icons.search),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(20),
-          borderSide: const BorderSide(
-            width: 2,
-            color: Color.fromRGBO(106, 96, 96, 1),
+    final themeBloc = context.read<ThemeBloc>();
+    return Row(
+      children: [
+        Expanded(
+          child: TextField(
+            controller: TextEditingController(text: bloc.searchQuery),
+            focusNode: textFieldFocus,
+            decoration: InputDecoration(
+              filled: true,
+              fillColor: context.color.cardTextColor,
+              hintText: 'Пошук',
+              hintStyle: TextStyle(
+                color: context.color.textColor,
+              ),
+              prefixIcon: Icon(
+                Icons.search,
+                color: context.color.textColor,
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(20),
+                borderSide: BorderSide(
+                  width: 2,
+                  color: context.color.selectedWidgetsColor,
+                ),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(20),
+                borderSide: BorderSide(
+                  width: 2,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+            onChanged: (value) {
+              if (timer != null) {
+                if (timer!.isActive) {
+                  timer!.cancel();
+                }
+              }
+              timer = Timer(
+                const Duration(milliseconds: 400),
+                () => bloc.add(SearchTextFieldChangedEvent(value)),
+              );
+            },
+            onEditingComplete: () {
+              // textFieldFocus.unfocus();
+            },
           ),
         ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(20),
-          borderSide: const BorderSide(
-            width: 2,
-            color: defaultColor,
-          ),
+        IconButton(
+          onPressed: () {
+            themeBloc.changeTheme();
+          },
+          icon: themeBloc.state is LightTheme
+              ? const Icon(Icons.nightlight_outlined)
+              : const Icon(Icons.wb_sunny_outlined),
+          color: context.color.textColor,
         ),
-      ),
-      onChanged: (value) {
-        if (timer != null) {
-          if (timer!.isActive) {
-            timer!.cancel();
-          }
-        }
-        timer = Timer(
-          const Duration(milliseconds: 400),
-          () => bloc.add(SearchTextFieldChangedEvent(value)),
-        );
-      },
-      onEditingComplete: () {
-        textFieldFocus.unfocus();
-      },
+      ],
     );
   }
 }
@@ -405,6 +367,7 @@ class SliverListOfProductsWidget extends StatelessWidget {
             (bloc.state as LoadingDataExeption).message,
             style: TextStyle(
               fontSize: 27,
+              color: context.color.textColor,
               fontWeight: FontWeight.bold,
             ),
             textAlign: TextAlign.center,
@@ -435,7 +398,7 @@ class SliverListOfProductsWidget extends StatelessWidget {
               height: 200,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(20),
-                color: const Color.fromRGBO(106, 96, 96, 1),
+                color: context.color.selectedWidgetsColor,
               ),
               margin: const EdgeInsets.only(bottom: 10),
               child: ProductCardWidget(productCard: bloc.productList[index]),
@@ -470,8 +433,7 @@ class ProductCardWidget extends StatelessWidget {
                 child: bloc.selectedMarketplace == null
                     ? Text(
                         productCard.marketplace,
-                        style:
-                            const TextStyle(color: Colors.white, fontSize: 17),
+                        style: productCardTextStyle,
                       )
                     : const SizedBox(height: 21),
               ),
@@ -513,51 +475,50 @@ class ProductCardWidget extends StatelessWidget {
             width: 10,
           ),
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(
-                  height: 15,
-                ),
-                SizedBox(
-                  child: Text(
-                    productCard.title,
-                    maxLines: 3,
-                    overflow: TextOverflow.ellipsis,
-                    style: productCardTextStyle,
-                  ),
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                Text(
-                  'Ціна: ${productCard.currentPrice} грн',
-                  style: productCardTextStyle,
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                productCard.percentOfSale != null
-                    ? Text(
-                        'Відсоток знижки: ${productCard.percentOfSale}',
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: SizedBox(
+                      child: Text(
+                        productCard.title,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: productCardTextStyle,
-                      )
-                    : const SizedBox(),
-                const SizedBox(
-                  height: 10,
-                ),
-                productCard.oldPrice != null
-                    ? SizedBox(
-                        width: 135,
-                        child: Text(
-                          'Минула ціна: ${productCard.oldPrice}',
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: productCardTextStyle,
-                        ),
-                      )
-                    : const SizedBox(),
-              ],
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: Text(
+                      'Ціна: ${productCard.currentPrice} грн',
+                      style: productCardTextStyle,
+                    ),
+                  ),
+                  productCard.percentOfSale != null
+                      ? Expanded(
+                          child: Text(
+                            'Відсоток знижки: ${productCard.percentOfSale}',
+                            style: productCardTextStyle,
+                          ),
+                        )
+                      : const SizedBox(),
+                  productCard.oldPrice != null
+                      ? SizedBox(
+                          width: 135,
+                          child: Expanded(
+                            child: Text(
+                              'Минула ціна: ${productCard.oldPrice}',
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: productCardTextStyle,
+                            ),
+                          ),
+                        )
+                      : const SizedBox(),
+                ],
+              ),
             ),
           ),
         ],
@@ -571,10 +532,14 @@ const allButtonSize = 64;
 const buttonsSpacing = 10;
 
 double calcButtonsWidth(int countOfCategories, double screenWidth) {
-  final result = (screenWidth - allButtonSize - buttonsSpacing - screenPaddingsSize * 2 - (countOfCategories - 1) * buttonsSpacing) /
+  final result = (screenWidth -
+          allButtonSize -
+          buttonsSpacing -
+          screenPaddingsSize * 2 -
+          (countOfCategories - 1) * buttonsSpacing) /
       countOfCategories;
-  if(result < 75) {
-    return 75;
+  if (result < 80) {
+    return 80;
   }
   return result;
 }
@@ -588,7 +553,7 @@ class MarketplaceSelectorWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final bloc = context.watch<MainScreenBloc>();
     if (bloc.state is LoadingDataExeption) {
-      return const SizedBox();
+      return const SizedBox(height: 50,width: 50,);
     }
     return BlocBuilder<MainScreenBloc, MainScreenState>(
       builder: (context, state) {
@@ -597,46 +562,42 @@ class MarketplaceSelectorWidget extends StatelessWidget {
         }
         final screenWidth = MediaQuery.of(context).size.width;
         final itemWidth = calcButtonsWidth(bloc.countOfCategories, screenWidth);
-            bloc.countOfCategories;
         return Row(
           children: [
-            BlocBuilder<MainScreenBloc, MainScreenState>(
-              builder: (context, state) {
-                return Container(
-                  width: 64,
-                  decoration: bloc.selectedMarketplace == null
-                      ? selectedElement
-                      : defaultDecoration,
-                  margin: EdgeInsets.only(right: buttonsSpacing.toDouble()),
-                  child: TextButton(
-                    onPressed: () {
-                      bloc.add(const AllCategoryButtonTapEvent());
-                    },
-                    style: buttonStyle,
-                    child: const Text(
-                      'Всі',
-                      style: defaultTextStyleOfMarkets,
-                    ),
+            Container(
+              width: 64,
+              decoration: bloc.selectedMarketplace == null
+                  ? selectedElementDecoration(context)
+                  : defaultDecoration(context),
+              margin: EdgeInsets.only(right: buttonsSpacing.toDouble()),
+              child: TextButton(
+                onPressed: () {
+                  // context.read<ThemeBloc>().add(ThemeChanged());
+                  bloc.add(const AllCategoryButtonTapEvent());
+                },
+                style: marketplacesButtonStyle(context),
+                child: Text(
+                  'Всі',
+                  style: defaultTextStyleOfMarkets.copyWith(
+                    color: context.color.textColor,
                   ),
-                );
-              },
+                ),
+              ),
             ),
             Expanded(
               child: SizedBox(
                 height: 55,
                 child: BlocBuilder<MainScreenBloc, MainScreenState>(
                   builder: (context, state) {
-                    // print('rebuilding');
                     return ListView.builder(
                       scrollDirection: Axis.horizontal,
                       itemCount: bloc.countOfCategories,
                       itemBuilder: (context, index) {
-   
                         return Container(
                           width: itemWidth,
                           decoration: bloc.selectedMarketplace == index
-                              ? selectedElement
-                              : defaultDecoration,
+                              ? selectedElementDecoration(context)
+                              : defaultDecoration(context),
                           margin: const EdgeInsets.only(right: 10),
                           child: TextButton(
                             onPressed: () {
@@ -644,10 +605,12 @@ class MarketplaceSelectorWidget extends StatelessWidget {
                                 MarketplaceSelectButtonTapEvent(index),
                               );
                             },
-                            style: buttonStyle,
+                            style: marketplacesButtonStyle(context),
                             child: Text(
                               bloc.marketsList[index],
-                              style: defaultTextStyleOfMarkets,
+                              style: defaultTextStyleOfMarkets.copyWith(
+                                color: context.color.textColor,
+                              ),
                             ),
                           ),
                         );
@@ -687,35 +650,34 @@ class _FiltersWidget extends StatelessWidget {
     int value;
     // final bloc = BlocProvider.of<MainScreenBloc>(context);
     final bloc = context.watch<MainScreenBloc>();
-    if(bloc.state is SmallestPriceCategorySelected){
+    if (bloc.state is SmallestPriceCategorySelected) {
       value = 1;
-    }else{ 
+    } else {
       value = 0;
     }
     return Container(
       height: 121,
-      decoration: defaultDecoration,
+      decoration: defaultDecoration(context),
       child: Column(
         children: [
           Expanded(
             child: AnimatedToggleSwitch<int>.size(
               fittingMode: FittingMode.none,
               textDirection: TextDirection.ltr,
-              // height: 121,
               values: const [0, 1],
               indicatorSize: Size.infinite,
               current: value,
               iconOpacity: 1,
               borderWidth: 0,
               selectedIconScale: 1,
-              style: const ToggleStyle(
+              style: ToggleStyle(
                 borderColor: Colors.transparent,
                 borderRadius: BorderRadius.only(
                   topRight: Radius.circular(20),
                   topLeft: Radius.circular(20),
                 ),
-                backgroundColor: Color.fromRGBO(217, 217, 217, 1),
-                indicatorColor: Color.fromRGBO(106, 96, 96, 1),
+                backgroundColor: context.color.cardTextColor,
+                indicatorColor: context.color.selectedWidgetsColor,
               ),
               styleBuilder: (i) {
                 if (i == 0) {
@@ -738,15 +700,22 @@ class _FiltersWidget extends StatelessWidget {
               },
               iconBuilder: (i) {
                 if (i == 0) {
-                  return const Text(
-                    'Найбільша вигода',
-                    style: defaultTextStyleOfSaleFilters,
-                    textAlign: TextAlign.center,
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    child: Text(
+                      'Найбільша вигода',
+                      style: defaultTextStyleOfSaleFilters.copyWith(
+                        color: context.color.textColor,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
                   );
                 }
-                return const Text(
+                return Text(
                   'Найдешевші',
-                  style: defaultTextStyleOfSaleFilters,
+                  style: defaultTextStyleOfSaleFilters.copyWith(
+                      color: context.color.textColor,
+                    ),
                   textAlign: TextAlign.center,
                 );
               },
@@ -769,11 +738,11 @@ class _FiltersWidget extends StatelessWidget {
                 },
               );
             },
-            style: filterButtonStyleSelector(bloc.isBrandFilersActive),
-            child: const Text(
+            style: filterButtonStyleSelector(bloc.isBrandFilersActive, context),
+            child: Text(
               'Фільтр брендів',
               style: TextStyle(
-                color: Colors.black,
+                color: context.color.textColor,
                 letterSpacing: 10,
                 fontSize: 22,
               ),
@@ -785,11 +754,11 @@ class _FiltersWidget extends StatelessWidget {
   }
 }
 
-ButtonStyle filterButtonStyleSelector(bool isActive) {
+ButtonStyle filterButtonStyleSelector(bool isActive, BuildContext context) {
   if (isActive) {
-    return filterButtonActiveStyle;
+    return filterButtonActiveStyle(context);
   }
-  return filterButtonDisableStyle;
+  return filterButtonDisableStyle(context);
 }
 
 class FiltersDialogWidget extends StatelessWidget {
@@ -805,23 +774,31 @@ class FiltersDialogWidget extends StatelessWidget {
     final brands =
         BlocProvider.of<MainScreenBloc>(mainScreenContext).getBrands();
     return Dialog(
-      child: Container(
-        margin: const EdgeInsets.all(10),
-        height: 400,
-        width: 200,
-        child: Center(
-          child: ListView.separated(
-            itemCount: brands.length,
-            itemBuilder: (context, index) {
-              return DialogBrandListTitleWidget(
-                brands: brands,
-                index: index,
-                mainScreenContext: mainScreenContext,
-              );
-            },
-            separatorBuilder: (context, index) {
-              return const SizedBox(height: 10);
-            },
+      backgroundColor: context.color.backgroundClolor,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(10),
+          child: SizedBox(
+            height: 400,
+            width: 200,
+            child: Center(
+              child: ListView.separated(
+                itemCount: brands.length,
+                itemBuilder: (context, index) {
+                  return DialogBrandListTitleWidget(
+                    brands: brands,
+                    index: index,
+                    mainScreenContext: mainScreenContext,
+                  );
+                },
+                separatorBuilder: (context, index) {
+                  return const SizedBox(height: 10);
+                },
+              ),
+            ),
           ),
         ),
       ),
@@ -849,15 +826,22 @@ class DialogBrandListTitleWidget extends StatelessWidget {
           shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(20)),
           ),
-          tileColor: lightBrown,
-          selectedTileColor: brown,
+          tileColor: context.color.unSelectedWidgetsColor,
+          selectedTileColor: context.color.selectedWidgetsColor,
           selected: brands[index].isSelected,
           title: Text(
             brands[index].name,
-            style: defaultTextStyleOfSaleFilters,
+            style: defaultTextStyleOfSaleFilters.copyWith(
+              color: context.color.textColor,
+            ),
           ),
           trailing: Checkbox(
             value: brands[index].isSelected,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+            checkColor: context.color.backgroundClolor,
+            activeColor: context.color.textColor,
             onChanged: (value) {
               brands[index].isSelected = value!;
               mainScreenContext
