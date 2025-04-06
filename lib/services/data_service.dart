@@ -1,8 +1,8 @@
 import 'package:markerplace_sales_monitor/entities.dart';
-import 'package:markerplace_sales_monitor/repositores/data_repository.dart';
+import 'package:markerplace_sales_monitor/repositores/data_repository_worker.dart';
 
 class DataService {
-  static final dataRepository = DataRepository(); 
+  static final dataRepository = ProxyDataRepository(); 
 
   Future<FormatedMarketplacesData> getSalesData(String category) async{ 
     final data = await dataRepository.getData(category);
