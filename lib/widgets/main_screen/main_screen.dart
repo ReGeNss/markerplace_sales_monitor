@@ -422,6 +422,7 @@ class ProductCardWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bloc = BlocProvider.of<MainScreenBloc>(context);
+    // print(productCard.title.toString());
     return Padding(
       padding: const EdgeInsets.only(right: 10),
       child: Row(
@@ -475,51 +476,41 @@ class ProductCardWidget extends StatelessWidget {
           const SizedBox(
             width: 10,
           ),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: SizedBox(
-                      child: Text(
-                        productCard.title,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: productCardTextStyle,
-                      ),
-                    ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(
+                  child: Text(
+                    productCard.title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: productCardTextStyle,
                   ),
-                  Expanded(
-                    child: Text(
-                      'Ціна: ${productCard.currentPrice} грн',
+                ),
+                Text(
+                  'Ціна: ${productCard.currentPrice} грн',
+                  style: productCardTextStyle,
+                ),
+                productCard.percentOfSale != null
+                    ? Text(
+                      'Відсоток знижки: ${productCard.percentOfSale}',
                       style: productCardTextStyle,
-                    ),
-                  ),
-                  productCard.percentOfSale != null
-                      ? Expanded(
-                          child: Text(
-                            'Відсоток знижки: ${productCard.percentOfSale}',
-                            style: productCardTextStyle,
-                          ),
-                        )
-                      : const SizedBox(),
-                  productCard.oldPrice != null
-                      ? SizedBox(
-                          width: 135,
-                          child: Expanded(
-                            child: Text(
-                              'Минула ціна: ${productCard.oldPrice}',
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: productCardTextStyle,
-                            ),
-                          ),
-                        )
-                      : const SizedBox(),
-                ],
-              ),
+                    )
+                    : const SizedBox(),
+                productCard.oldPrice != null
+                    ? SizedBox(
+                        width: 135,
+                        child: Text(
+                          'Минула ціна: ${productCard.oldPrice}',
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: productCardTextStyle,
+                        ),
+                      )
+                    : const SizedBox(),
+              ],
             ),
           ),
         ],
